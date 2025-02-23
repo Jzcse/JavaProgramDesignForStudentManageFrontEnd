@@ -1,0 +1,13 @@
+
+#min{
+  -fx-background-image: url("shanda1.jpg");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: cover;
+}
+.button {
+ -fx-background-color: red;
+ -fx-text-fill: white;
+}
+
+
+

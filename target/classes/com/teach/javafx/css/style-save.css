@@ -1,0 +1,138 @@
+
+    #min{
+
+          -fx-background-image: url("shanda1.jpg");
+          -fx-background-repeat: no-repeat;
+          -fx-background-size: cover;
+    }
+    #loginPanel{
+          -fx-background-color:#FAFAD2;
+          -fx-border-radius:10;
+          -fx-background-radius:10;
+    }
+    #registPanel{
+              -fx-background-color:#FAFAD2;
+              -fx-border-radius:10;
+              -fx-background-radius:10;
+        }
+    #label{
+
+    }
+    #login{
+        -fx-background-radius: 25;
+        -fx-border-radius: 25;
+        -fx-background-color: linear-gradient(to right, #FFFFFF , #FFC0CB );
+        -fx-text-alignment: center;
+        -fx-text-fill: #fff;
+        -fx-font-weight: bolder;
+    }
+    #login:hover{
+        -fx-font-size: 20px;
+       -fx-cursor: hand;
+       -fx-effect: innershadow( three-pass-box , rgba(0,0,0,1) , 6, 0.5, 0 , 2 );
+    }
+
+    #close{
+        -fx-background-radius:25 0 0 25;
+        -fx-border-radius: 25 0 0 25;
+        -fx-background-color: #CD5C5C;
+        -fx-text-alignment: center;
+        -fx-text-fill: #fff;
+    }
+    #close:hover{
+        -fx-font-size: 20px;
+       -fx-cursor: hand;
+       -fx-effect:dropshadow(three-pass-box, #FF4500,15.0,0.1,0,0);
+    }
+
+    #other{
+    -fx-text-fill:#fff;
+        -fx-background-radius:25 0 0 25;
+        -fx-border-radius: 25 0 0 25;
+        -fx-background-color: #1a83e1;
+        -fx-background-position: 20 12;
+        -fx-background-size: 15px;
+        -fx-background-repeat: no-repeat;
+        -fx-background-insets: 100%;
+    }
+    #other:hover{
+               -fx-background-color:#7B68EE;
+               -fx-effect:dropshadow(three-pass-box, #7B68EE,15.0,0.1,0,0);
+    }
+
+    #regist{
+        -fx-text-fill:#fff;
+        -fx-background-radius:25 0 0 25;
+        -fx-border-radius: 25 0 0 25;
+        -fx-background-color: #1a83e1;
+        -fx-background-position: 20 12;
+        -fx-background-size: 15px;
+        -fx-background-repeat: no-repeat;
+        -fx-background-insets: 100%;
+    }
+    #regist:hover{
+               -fx-background-color:#7B68EE;
+               -fx-effect:dropshadow(three-pass-box, #7B68EE,15.0,0.1,0,0);
+    }
+    #LOGIN{
+        -fx-text-fill:#fff;
+        -fx-background-radius:25 0 0 25;
+        -fx-border-radius: 25 0 0 25;
+        -fx-background-color: #1a83e1;
+        -fx-background-position: 20 12;
+        -fx-background-size: 15px;
+        -fx-background-repeat: no-repeat;
+        -fx-background-insets: 100%;
+    }
+    #LOGIN:hover{
+           -fx-cursor: hand;
+                  -fx-background-color:#7B68EE;
+                  -fx-effect:dropshadow(three-pass-box, #7B68EE,15.0,0.1,0,0);
+    }
+    #regist:selected{
+        -fx-font-size: 16px;
+    }
+
+    #id{
+        -fx-background-radius: 25;
+        -fx-border-radius: 25;
+    }
+    #id:hover{
+        -fx-color : #1a83e1;
+        -fx-effect: innershadow( three-pass-box , #fff600 , 10, 0.2 , 0 , 0 );
+    }
+    #id:selected{
+        -fx-color : #1a83e1;
+    }
+
+    #pwd{
+        -fx-background-radius: 25;
+        -fx-border-radius: 25;
+    }
+
+    #pwd:hover{
+        -fx-color : #1a83e1;
+        -fx-effect: innershadow( three-pass-box , #00fffc , 10, 0.2 , 0 , 0 );
+    }
+
+    #pwd:selected{
+        -fx-background-color : #FF0000;
+    }
+    #registSure{
+        -fx-text-fill:#fff;
+        -fx-background-radius:0 0 0 0;
+        -fx-border-radius: 0 0 0 0;
+        -fx-background-color: #1a83e1;
+    }
+    #registSure:hover{
+        -fx-text-fill:#fff;
+        -fx-effect: dropshadow( three-pass-box , #1a83e1 , 10, 0.5 , 0 , 0 );
+    }
+
+.login-button {
+    -fx-font-family: "LiSu";
+}
+
+
+
+

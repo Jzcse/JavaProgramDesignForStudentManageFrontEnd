@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+
+<!-- 学生个人简历界面 FXML配置文件 对应页面交互控制类 com.teach.javafx.controller.StudentIntroduceController -->
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<BorderPane  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            style= "-fx-background-image: url('shanda1.jpg'); -fx-background-repeat: no-repeat; -fx-background-size: cover;" fx:controller="com.teach.javafx.controller.CourseController">
+   <center>
+      <TableView fx:id="dataTableView"  >
+         <columns>
+            <TableColumn fx:id="numColumn" prefWidth="120.0" text="课程号" />
+            <TableColumn fx:id="nameColumn" prefWidth="90.0" text="课程名" />
+            <TableColumn fx:id="creditColumn" prefWidth="60.0" text="学分" />
+            <TableColumn fx:id="preCourseColumn" prefWidth="120.0" text="前序课" />
+            <TableColumn fx:id="operateColumn" prefWidth="120.0" text="操作" />
+         </columns>
+      </TableView>
+   </center>
+</BorderPane>
