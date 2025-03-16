@@ -105,8 +105,8 @@ public class StudentController extends ToolController {
      */
     private void setTableViewData() {
         observableList.clear();
-        for (int j = 0; j < studentList.size(); j++) {
-            observableList.addAll(FXCollections.observableArrayList(studentList.get(j)));
+        for (Map map : studentList) {
+            observableList.addAll(FXCollections.observableArrayList(map));
         }
         dataTableView.setItems(observableList);
     }
