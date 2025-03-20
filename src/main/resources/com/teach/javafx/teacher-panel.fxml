@@ -64,7 +64,7 @@
                     <TableColumn fx:id="addressColumn" prefWidth="145.0" text="地址"/>
                 </columns>
             </TableView>
-            <VBox alignment="TOP_CENTER" spacing="20.0">
+            <VBox alignment="TOP_CENTER" spacing="20.0" minWidth="380.0" maxWidth="450.0">
                 <padding>
                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                 </padding>
@@ -111,7 +111,7 @@
                     <Label text="地址" GridPane.rowIndex="10"/>
                     <TextField fx:id="addressField" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
                     <Button fx:id="photoButton" onAction="#onPhotoButtonClick" styleClass="border_black_1"
-                            GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
+                            GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4" text="上传照片"/>
                 </GridPane>
                 <FlowPane alignment="CENTER" columnHalignment="CENTER" prefHeight="36.0">
                     <Button onAction="#onSaveButtonClick" text="保存">
@@ -129,6 +129,13 @@
                             <Insets right="5.0" top="5.0"/>
                         </FlowPane.margin>
                     </Button>
+                </FlowPane>
+                <FlowPane alignment="CENTER" >
+                    <Pagination fx:id="pagination">
+                        <FlowPane.margin>
+                            <Insets bottom="5.0"/>
+                        </FlowPane.margin>
+                    </Pagination>
                 </FlowPane>
             </VBox>
         </SplitPane>
