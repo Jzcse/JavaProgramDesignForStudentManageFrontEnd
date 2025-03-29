@@ -17,9 +17,11 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+
+<!---->
 <!--  学生管理 FXML 配置文件 对应的页面交互控制类 com.teach.javafx.controller.StudentController 如果是切换成本地开发模式 界面配置不变，将页面交互控制类 切换为 com.teach.javafx.controller.StudentControllerLocal-->
 <BorderPane  xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"  prefWidth="800.0" fx:controller="com.teach.javafx.controller.StudentController">
-   <top>
+    <top>
        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" >
            <children>
                <FlowPane prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -83,7 +85,7 @@
                     <TableColumn fx:id="addressColumn" prefWidth="145.0" text="地址" />
                 </columns>
             </TableView>
-            <VBox alignment="TOP_CENTER" spacing="20.0" >
+            <VBox alignment="TOP_CENTER" spacing="20.0" fx:id="VBox">
                 <padding>
                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                 </padding>
@@ -133,17 +135,22 @@
                     </children>
                 </GridPane>
                <FlowPane alignment="CENTER" columnHalignment="CENTER" prefHeight="36.0">
-                   <Button onAction="#onSaveButtonClick" text="保存" >
+                   <Button onAction="#onSaveButtonClick" text="保存" fx:id="saveButton">
                        <FlowPane.margin>
                            <Insets right="5.0" top="5.0" />
                        </FlowPane.margin>
                    </Button>
-                   <Button onAction="#onFamilyButtonClick" text="家庭信息" >
+                   <Button onAction="#onEditButtonClick" text="修改" fx:id="editButton">
                        <FlowPane.margin>
                            <Insets right="5.0" top="5.0" />
                        </FlowPane.margin>
                    </Button>
-                   <Button onAction="#onImportFeeButtonClick" text="导入消费记录" >
+                   <Button onAction="#onFamilyButtonClick" text="家庭信息" fx:id="familyButton">
+                       <FlowPane.margin>
+                           <Insets right="5.0" top="5.0" />
+                       </FlowPane.margin>
+                   </Button>
+                   <Button onAction="#onImportFeeButtonClick" text="导入消费记录" fx:id="importFeeButton">
                        <FlowPane.margin>
                            <Insets right="5.0" top="5.0" />
                        </FlowPane.margin>

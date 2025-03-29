@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ public class teacherController extends ToolController {
     @FXML
     private  TableColumn<Map<String, String>, String> addressColumn;//教师地址
     //components of right box for detail info of teacher
+    @FXML
+    private VBox vBoxPanel;
     @FXML
     private TextField numField;
     @FXML
@@ -92,7 +95,7 @@ public class teacherController extends ToolController {
         int currentPage = (int) pagination.getCurrentPageIndex();
         DataRequest dataRequest = new DataRequest();
         dataRequest.add("page", currentPage);
-        dataRequest.add("size", 35);
+        dataRequest.add("size", 33);
         DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/getTeacherList", dataRequest);
         if (dataResponse != null && dataResponse.getCode() == 0){
             teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
@@ -114,10 +117,10 @@ public class teacherController extends ToolController {
         if (dataResponse != null && dataResponse.getCode() == 0){
             Map<String, String> map = (Map<String, String>) dataResponse.getData();
             teacherCount = Integer.parseInt(CommonMethod.getString(map, "count"));
-            if (teacherCount % 35 == 0){
-                pageCount = teacherCount / 35;
+            if (teacherCount % 33 == 0){
+                pageCount = teacherCount / 33;
             } else {
-                pageCount = teacherCount / 35 + 1;
+                pageCount = teacherCount / 33 + 1;
             }
             pagination.setPageCount(pageCount);
         } else {
@@ -129,7 +132,7 @@ public class teacherController extends ToolController {
     public void initialize() {
         DataRequest dataRequest = new DataRequest();
         dataRequest.add("page", 0);
-        dataRequest.add("size", 35);
+        dataRequest.add("size", 33);
         DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/getTeacherList", dataRequest);
         if (dataResponse != null && dataResponse.getCode() == 0){
             teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
@@ -170,16 +173,25 @@ public class teacherController extends ToolController {
         TableView.TableViewSelectionModel<Map<String, String>> tableViewSelectionModel = dataTableView.getSelectionModel();
         ObservableList<Integer> list = tableViewSelectionModel.getSelectedIndices();
         list.addListener(this::onTableRowSelect);
+        //
         setTableViewData();
         //处理性别下拉框
         genderList = HttpRequestUtil.getDictionaryOptionItemList("XBM");
         genderComboBox.getItems().addAll(genderList);
         //设置日期格式
         birthdayPick.setConverter(new LocalDateStringConverter("yyyy-MM-dd"));
+        //demo
+        DataResponse demo = HttpRequestUtil.request("/api/teacher/demo", new DataRequest());
+        System.out.println(demo.getData() instanceof Double);
+        //设置右侧的面板初始为隐藏状态
+        vBoxPanel.setManaged(false);
+        vBoxPanel.setVisible(false);
     }
 
     public void onTableRowSelect(ListChangeListener.Change<? extends Integer> change){
         isNew = false;
+        vBoxPanel.setVisible(true);
+        vBoxPanel.setManaged(true);
         changeTeacherInfo();
     }
 

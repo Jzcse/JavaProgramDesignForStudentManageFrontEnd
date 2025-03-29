@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.FamilyMemberController">
+    <top>
+        <FlowPane>
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#onAddButtonClick" text="添加家庭成员">
+                <FlowPane.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </FlowPane.margin>
+            </Button>
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="删除家庭成员">
+                <FlowPane.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </FlowPane.margin>
+            </Button>
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#onImportButtonClick" text="导入家庭成员">
+                <FlowPane.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </FlowPane.margin>
+            </Button>
+        </FlowPane>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.7438616071428572">
+            <TableView fx:id="familyTableView">
+                <columns>
+                    <TableColumn fx:id="relation" text="关系" />
+                    <TableColumn fx:id="name" text="姓名" />
+                    <TableColumn fx:id="age" text="年龄" />
+                    <TableColumn fx:id="gender" text="性别" />
+                    <TableColumn fx:id="unit" text="工作单位" />
+                </columns>
+            </TableView>
+            <VBox fx:id="vBoxPanel" alignment="TOP_CENTER" maxWidth="200" minWidth="170">
+                <FlowPane alignment="TOP_CENTER">
+                    <Label>
+                        <FlowPane.margin>
+                            <Insets bottom="10" top="10" />
+                        </FlowPane.margin>
+                    </Label>
+                </FlowPane>
+                <GridPane alignment="CENTER" hgap="10" >
+                    <Label text="姓名" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField maxWidth="100" GridPane.columnIndex="1" GridPane.rowIndex="0" fx:id="nameTextField" />
+                    <Label text="关系" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField maxWidth="100" GridPane.columnIndex="1" GridPane.rowIndex="1" fx:id="relationTextField" />
+                    <Label text="年龄" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <TextField maxWidth="100" GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="ageTextField" />
+                    <Label text="性别" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <ComboBox fx:id="genderCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Label text="工作单位" textAlignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <TextField maxWidth="100" GridPane.columnIndex="1" GridPane.rowIndex="4" fx:id="unitTextField" />
+                    <columnConstraints>
+                       <ColumnConstraints halignment="RIGHT" />
+                       <ColumnConstraints halignment="LEFT" />
+                    </columnConstraints>
+                    <rowConstraints>
+                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" />
+                    </rowConstraints>
+                </GridPane>
+                <FlowPane alignment="CENTER">
+                    <Button fx:id="saveOrAddButton" alignment="CENTER" text="demo" onAction="#onSaveOrAddButtonClick">
+                        <FlowPane.margin>
+                            <Insets bottom="10" top="10" />
+                        </FlowPane.margin>
+                    </Button>
+                    <Button fx:id="editButton" alignment="CENTER" text="修改" onAction="#onEditButtonClick">
+                        <FlowPane.margin>
+                            <Insets bottom="10" top="10" />
+                        </FlowPane.margin>
+                    </Button>
+                </FlowPane>
+            </VBox>
+        </SplitPane>
+    </center>
+</BorderPane>
