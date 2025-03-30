@@ -49,19 +49,19 @@
     </top>
     <center>
         <SplitPane dividerPositions="0.7,0.3">
-            <TableView fx:id="dataTableView">
+            <TableView fx:id="dataTableView" editable="false">
                 <columns>
-                    <TableColumn fx:id="numColumn" prefWidth="100.0" text="工号"/>
-                    <TableColumn fx:id="nameColumn" prefWidth="70.0" text="姓名"/>
-                    <TableColumn fx:id="deptColumn" prefWidth="75.0" text="院系"/>
-                    <TableColumn fx:id="majorColumn" prefWidth="75.0" text="专业"/>
-                    <TableColumn fx:id="titleColumn" prefWidth="75.0" text="职称"/>
-                    <TableColumn fx:id="cardColumn" prefWidth="125.0" text="证件号码"/>
-                    <TableColumn fx:id="genderColumn" prefWidth="55.0" text="性别"/>
-                    <TableColumn fx:id="birthdayColumn" prefWidth="75.0" text="出生日期"/>
-                    <TableColumn fx:id="emailColumn" prefWidth="125.0" text="邮箱"/>
-                    <TableColumn fx:id="phoneColumn" prefWidth="95.0" text="电话"/>
-                    <TableColumn fx:id="addressColumn" prefWidth="145.0" text="地址"/>
+                    <TableColumn fx:id="numColumn" prefWidth="100.0" text="工号" editable="false"/>
+                    <TableColumn fx:id="nameColumn" prefWidth="70.0" text="姓名" editable="false"/>
+                    <TableColumn fx:id="deptColumn" prefWidth="75.0" text="院系" editable="false"/>
+                    <TableColumn fx:id="majorColumn" prefWidth="75.0" text="专业" editable="false"/>
+                    <TableColumn fx:id="titleColumn" prefWidth="75.0" text="职称" editable="false"/>
+                    <TableColumn fx:id="cardColumn" prefWidth="125.0" text="证件号码" editable="false"/>
+                    <TableColumn fx:id="genderColumn" prefWidth="55.0" text="性别" editable="false"/>
+                    <TableColumn fx:id="birthdayColumn" prefWidth="75.0" text="出生日期" editable="false"/>
+                    <TableColumn fx:id="emailColumn" prefWidth="125.0" text="邮箱" editable="false"/>
+                    <TableColumn fx:id="phoneColumn" prefWidth="95.0" text="电话" editable="false"/>
+                    <TableColumn fx:id="addressColumn" prefWidth="145.0" text="地址" editable="false"/>
                 </columns>
             </TableView>
             <VBox alignment="TOP_CENTER" spacing="20.0" minWidth="380.0" maxWidth="450.0" fx:id="vBoxPanel">

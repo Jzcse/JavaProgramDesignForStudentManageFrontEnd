@@ -4,6 +4,7 @@ import com.teach.javafx.request.HttpRequestUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -84,5 +85,29 @@ public class MainApplication extends Application {
 
     public static void setCanClose(boolean canClose) {
         MainApplication.canClose = canClose;
+    }
+
+
+
+
+
+    /**
+     * 创建并显示子窗口
+     * @param title 窗口标题
+     * @param fxmlPath FXML文件路径
+     */
+    public static void showChildWindow(String title, String fxmlPath) {
+        try {
+            Stage childStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource(fxmlPath));
+            Scene scene = new Scene(fxmlLoader.load());
+            childStage.setTitle(title);
+            childStage.setScene(scene);
+            childStage.initOwner(mainStage);  // 设置父窗口
+            childStage.initModality(Modality.WINDOW_MODAL);  // 设置为模态窗口
+            childStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

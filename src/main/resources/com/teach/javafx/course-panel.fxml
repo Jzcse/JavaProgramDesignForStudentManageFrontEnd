@@ -1,21 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.BorderPane?>
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<!-- 学生个人简历界面 FXML配置文件 对应页面交互控制类 com.teach.javafx.controller.StudentIntroduceController -->
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<BorderPane  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            style= "-fx-background-image: url('shanda1.jpg'); -fx-background-repeat: no-repeat; -fx-background-size: cover;" fx:controller="com.teach.javafx.controller.CourseController">
-   <center>
-      <TableView fx:id="dataTableView"  >
-         <columns>
-            <TableColumn fx:id="numColumn" prefWidth="120.0" text="课程号" />
-            <TableColumn fx:id="nameColumn" prefWidth="90.0" text="课程名" />
-            <TableColumn fx:id="creditColumn" prefWidth="60.0" text="学分" />
-            <TableColumn fx:id="preCourseColumn" prefWidth="120.0" text="前序课" />
-            <TableColumn fx:id="operateColumn" prefWidth="120.0" text="操作" />
-         </columns>
-      </TableView>
-   </center>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.teach.javafx.controller.CourseController"
+            prefHeight="400.0" prefWidth="1000.0">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="5.0" >
+            <padding>
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+            </padding>
+            <FlowPane prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <Button mnemonicParsing="false" onAction="#onAddButtonClick" text="添加">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#onDeleteButtonClick" text="删除">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Button>
+                <Button text="课程安排" onAction="#onCourseArrangementButtonClick" >
+                <FlowPane.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </FlowPane.margin>
+                </Button>
+            </FlowPane>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <FlowPane alignment="TOP_RIGHT" prefHeight="40.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+                <Label prefWidth="49.0" text="课程搜索">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Label>
+                <TextField fx:id="searchField" prefWidth="150.0" promptText="请输入课程编号或名称">  <!-- 添加fx:id -->
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </TextField>
+                <Button mnemonicParsing="false" onAction="#onSearchButtonClick" text="确认">  <!-- 确保onAction正确 -->
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Button>
+            </FlowPane>
+        </HBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.7,0.3" prefHeight="400.0" prefWidth="1000.0">
+            <TableView fx:id="dataTableView" prefHeight="400.0" prefWidth="700.0">
+                <columns>
+                    <TableColumn fx:id="numColumn" prefWidth="100.0" text="课程编号" />
+                    <TableColumn fx:id="nameColumn" prefWidth="150.0" text="课程名称" />
+                    <TableColumn fx:id="creditColumn" prefWidth="50.0" text="学分" />
+                    <TableColumn fx:id="preCourseNameColumn" prefWidth="100.0" text="先修课程" />
+                    <TableColumn fx:id="classroomColumn" prefWidth="100.0" text="教室" />
+                    <TableColumn fx:id="dayOfWeekColumn" prefWidth="100.0" text="星期" />
+                    <TableColumn fx:id="timeColumn" prefWidth="200.0" text="时间" />
+                    <TableColumn fx:id="operateColumn" prefWidth="100.0" text="操作" />
+                    <!-- 添加其他需要的列 -->
+                </columns>
+            </TableView>
+            <VBox alignment="TOP_CENTER" spacing="20.0" prefWidth="300.0">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <GridPane hgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="124.0" minWidth="10.0" prefWidth="67.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="193.0" minWidth="10.0" prefWidth="193.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
+                    <Label text="课程编号" GridPane.rowIndex="0" />
+                    <TextField fx:id="courseNumField" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="如：001"/>
+                    <Label text="课程名称" GridPane.rowIndex="1" />
+                    <TextField fx:id="courseNameField" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="如：Java程序设计"/>
+                    <Label text="学分" GridPane.rowIndex="2" />
+                    <TextField fx:id="creditField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <Label text="先修课程" GridPane.rowIndex="3" />
+                    <TextField fx:id="preCourseNameField" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="如：C++程序设计"/>
+                    <Label text="教室" GridPane.rowIndex="4" />
+                    <TextField fx:id="classroomField" GridPane.columnIndex="1" GridPane.rowIndex="4" promptText="如：五区108"/>
+                    <Label text="星期" GridPane.rowIndex="5" />
+                    <ComboBox fx:id="dayOfWeekComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="星期一" />
+                                <String fx:value="星期二" />
+                                <String fx:value="星期三" />
+                                <String fx:value="星期四" />
+                                <String fx:value="星期五" />
+                                <String fx:value="星期六" />
+                                <String fx:value="星期日" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                    <Label text="时间" GridPane.rowIndex="6" />
+                    <ComboBox fx:id="timeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="第一节：08:00-09:50" />
+                                <String fx:value="第二节：10:10-12:00" />
+                                <String fx:value="第三节：14:00-15:50" />
+                                <String fx:value="第四节：16:10-18:00" />
+                                <String fx:value="第五节：19:00-20:50" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                </GridPane>
+                <FlowPane alignment="CENTER" columnHalignment="CENTER" prefHeight="36.0">
+                    <Button onAction="#onSaveCourseButtonClick" text="保存">
+                        <FlowPane.margin>
+                            <Insets right="5.0" top="5.0" />
+                        </FlowPane.margin>
+                    </Button>
+                    <Button onAction="#onClearCourseButtonClick" text="清空">
+                        <FlowPane.margin>
+                            <Insets right="5.0" top="5.0" />
+                        </FlowPane.margin>
+                    </Button>
+                </FlowPane>
+            </VBox>
+        </SplitPane>
+    </center>
 </BorderPane>
