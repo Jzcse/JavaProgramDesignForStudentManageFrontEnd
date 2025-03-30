@@ -4,7 +4,9 @@ import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.base.MessageDialog;
 import com.teach.javafx.util.CommonMethod;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import com.teach.javafx.request.HttpRequestUtil;
@@ -16,6 +18,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import com.teach.javafx.request.DataRequest;
 import com.teach.javafx.request.DataResponse;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -395,7 +399,14 @@ public class CourseController {
     @FXML
     private void onCourseArrangementButtonClick() {
         try {
-            MainApplication.showChildWindow("课程安排", "/com/teach/javafx/courseChild-panel.fxml");
+            Stage childStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/teach/javafx/courseChild-panel.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            childStage.setTitle("课程安排");
+            childStage.setScene(scene);
+            childStage.initOwner(dataTableView.getScene().getWindow());  // 设置父窗口
+            childStage.initModality(Modality.WINDOW_MODAL);  // 设置为模态窗口
+            childStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             MessageDialog.showDialog("无法打开课程安排窗口：" + e.getMessage());
