@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +132,7 @@ public class StudentController extends ToolController {
         addressField.setEditable(isEditable);
         genderComboBox.setDisable(!isEditable);
         birthdayPick.setEditable(isEditable);
+        birthdayPick.setDisable(!isEditable);
     }
 
     private void refreshStudentList(){
@@ -499,13 +502,13 @@ public class StudentController extends ToolController {
     @FXML
     protected void onImportButtonClick() {
         FileChooser fileDialog = new FileChooser();
-        fileDialog.setTitle("前选择学生数据表");
-        fileDialog.setInitialDirectory(new File("D:/"));
+        fileDialog.setTitle("请选择学生数据表");
+        fileDialog.setInitialDirectory(new File("C:/"));
         fileDialog.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("XLSX 文件", "*.xlsx"));
         File file = fileDialog.showOpenDialog(null);
         String paras = "";
-        DataResponse res = HttpRequestUtil.importData("/api/term/importStudentData", file.getPath(), paras);
+        DataResponse res = HttpRequestUtil.importData("/api/student/importStudentData", file.getPath(), paras);
         if (res.getCode() == 0) {
             MessageDialog.showDialog("上传成功！");
         } else {
@@ -628,41 +631,103 @@ public class StudentController extends ToolController {
     }
 
     public void displayPhoto(){
-        DataRequest req = new DataRequest();
-        req.add("fileName", "photo/" + personId + ".jpg");  //个人照片显示
-        byte[] bytes = HttpRequestUtil.requestByteData("/api/base/getFileByteData", req);
-        if (bytes != null) {
-            try {
-                FileOutputStream out = new FileOutputStream("d:/temp/photo.jpg");
-                out.write(bytes);
-                out.close();
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-            Image img = new Image(in);
-            photoImageView.setImage(img);
+        if (personId == null){
+            MessageDialog.showDialog("未选择教师");
+            return;
         }
+        try {
+            // 获取当前文件的路径并设置图片文件保存位置
+            File saveDir;
+            String classPath = System.getProperty("java.class.path");
+            if(classPath.endsWith(".jar")){
+                // 生产环境
+                java.net.URI uri = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
+                java.io.File jarFile = new java.io.File(uri);
+                saveDir = jarFile.getParentFile();
+            } else {
+                // 开发环境
+                saveDir = new File(System.getProperty("user.dir"));
+            }
+            // 新建保存图片的文件夹
+            String newDir = "photos";
+            File newDirFile = new File(saveDir, newDir);
+            if(!newDirFile.exists()){
+                if(newDirFile.mkdirs()){
+                    System.out.println("新目录创建成功" + newDirFile.getAbsolutePath());
+                } else {
+                    MessageDialog.showDialog("无法在当前文件夹创建新目录用以下载并保存用户的图片，请检查权限！");
+                }
+            }
+            // 下载图片并保存到指定文件夹
+            DataRequest dataRequest = new DataRequest();
+            dataRequest.add("personId", personId);
+            DataResponse dataResponse = HttpRequestUtil.request("/api/photo/download", dataRequest);
+            if (dataResponse != null){
+                if (dataResponse.getCode() == 0){
+                    System.out.println("下载成功");
+                    try{
+                        Map<String, String> dataMap = (Map<String, String>) dataResponse.getData();
+                        String data = CommonMethod.getString(dataMap, "file");
+                        byte[] fileBytes = java.util.Base64.getDecoder().decode(data);
+
+                        File saveFile = new File(newDirFile, personId + ".jpg");
+
+                        Files.write(saveFile.toPath(), fileBytes);
+                        System.out.println("文件保存成功");
+
+                        String url = saveFile.toURI().toString();
+                        Image image = new Image(url);
+                        if (image.isError()){
+                            System.out.println("图片加载失败");
+                        } else {
+                            System.out.println("图片加载成功");
+                            photoImageView.setImage(image);
+                        }
+                    } catch (IOException e) {
+                        MessageDialog.showDialog("照片下载失败，请检查：\n1. 文件权限；\n2. 磁盘空间；\n3. 写入文件夹是否正在被其他程序占用。");
+                        throw new RuntimeException(e);
+                    } catch (IllegalArgumentException e){
+                        System.out.println("无效的本地路径");
+                        Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
+                        photoImageView.setImage(image);
+                    }
+                } else {
+                    Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
+                    photoImageView.setImage(image);
+                    System.out.println("下载失败");
+                    System.out.println(dataResponse.getMsg());
+                }
+            } else {
+                MessageDialog.showDialog("获取照片失败，请重新启动后端!");
+            }
+        } catch (URISyntaxException e) {
+            MessageDialog.showDialog("无法解析当前文件路径！");
+            throw new RuntimeException(e);
+        }
+
 
     }
 
     @FXML
-    public void onPhotoButtonClick(){
-        FileChooser fileDialog = new FileChooser();
-        fileDialog.setTitle("图片上传");
-//        fileDialog.setInitialDirectory(new File("C:/"));
-        fileDialog.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JPG 文件", "*.jpg"));
-        File file = fileDialog.showOpenDialog(null);
-        if(file == null)
-            return;
-        DataResponse res =HttpRequestUtil.uploadFile("/api/base/uploadPhoto",file.getPath(),"photo/" + personId + ".jpg");
-        if(res.getCode() == 0) {
-            MessageDialog.showDialog("上传成功！");
-            displayPhoto();
-        }
-        else {
-            MessageDialog.showDialog(res.getMsg());
+    public void onPhotoButtonClick() throws IOException {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("请选择学生图片");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("图片文件", "*.png", "*.jpg", "*.jpeg")
+        );
+        File file = chooser.showOpenDialog(null);
+        if(file != null) {
+            DataResponse dataResponse = HttpRequestUtil.newUploadFile("/api/photo/upload", file, "file", personId.toString());
+            if (dataResponse!= null){
+                if (dataResponse.getCode() == 0){
+                    MessageDialog.showDialog("上传成功！");
+                    displayPhoto();
+                }
+            }
+        } else {
+            System.out.println("Error to choose jpg files");
+            MessageDialog.showDialog("Error to choose jpg files");
         }
     }
     @FXML

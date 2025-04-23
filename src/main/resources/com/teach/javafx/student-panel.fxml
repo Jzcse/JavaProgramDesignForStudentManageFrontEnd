@@ -20,7 +20,7 @@
 
 <!---->
 <!--  学生管理 FXML 配置文件 对应的页面交互控制类 com.teach.javafx.controller.StudentController 如果是切换成本地开发模式 界面配置不变，将页面交互控制类 切换为 com.teach.javafx.controller.StudentControllerLocal-->
-<BorderPane  xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"  prefWidth="800.0" fx:controller="com.teach.javafx.controller.StudentController">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" prefWidth="800.0" fx:controller="com.teach.javafx.controller.StudentController">
     <top>
        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" >
            <children>

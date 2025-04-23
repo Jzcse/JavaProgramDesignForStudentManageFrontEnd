@@ -17,8 +17,15 @@ import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +59,8 @@ public class teacherController extends ToolController {
     private  TableColumn<Map<String, String>, String> addressColumn;//教师地址
     //components of right box for detail info of teacher
     @FXML
+    private ImageView photoImage;
+    @FXML
     private VBox vBoxPanel;
     @FXML
     private TextField numField;
@@ -77,9 +86,21 @@ public class teacherController extends ToolController {
     private DatePicker birthdayPick;
     @FXML
     private TextField numNameTextField;
+    @FXML
+    private Button photoButton;
     //pagination component
     @FXML
     private Pagination pagination;
+    //
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button familyButton;
+    @FXML
+    private Button editButton;
+    @FXML
+    private Button importFeeButton;
+
 
 
     //service
@@ -90,6 +111,27 @@ public class teacherController extends ToolController {
     private ArrayList<Map<String, String>> teacherList = new ArrayList<>();
     private ObservableList<Map<String, String>> observableList = FXCollections.observableArrayList();
     private List<OptionItem> genderList;
+    private String baseUrl;
+
+    private void setVBoxVisible(boolean isVisible){
+        vBoxPanel.setVisible(isVisible);
+        vBoxPanel.setManaged(isVisible);
+    }
+
+    private void setEditAble(boolean isEditAble){
+        numField.setEditable(isEditAble);
+        nameField.setEditable(isEditAble);
+        deptField.setEditable(isEditAble);
+        majorField.setEditable(isEditAble);
+        titleField.setEditable(isEditAble);
+        cardField.setEditable(isEditAble);
+        emailField.setEditable(isEditAble);
+        phoneField.setEditable(isEditAble);
+        addressField.setEditable(isEditAble);
+        genderComboBox.setDisable(!isEditAble);
+        birthdayPick.setEditable(isEditAble);
+        birthdayPick.setDisable(!isEditAble);
+    }
 
     public void refreshTeacherList(){
         int currentPage = (int) pagination.getCurrentPageIndex();
@@ -181,18 +223,111 @@ public class teacherController extends ToolController {
         //设置日期格式
         birthdayPick.setConverter(new LocalDateStringConverter("yyyy-MM-dd"));
         //demo
-        DataResponse demo = HttpRequestUtil.request("/api/teacher/demo", new DataRequest());
-        System.out.println(demo.getData() instanceof Double);
+
+        // get base url
+        DataRequest dataRequest1 = new DataRequest();
+        DataResponse dataResponse1 = HttpRequestUtil.request("/api/photo/getBaseUrl", dataRequest1);
+        if (dataResponse1 != null) {
+            baseUrl = (String) dataResponse1.getData();
+        } else {
+            MessageDialog.showDialog("获取url失败，请重新启动后端!");
+        }
         //设置右侧的面板初始为隐藏状态
-        vBoxPanel.setManaged(false);
-        vBoxPanel.setVisible(false);
+        setVBoxVisible(false);
+        setEditAble(false);
     }
 
-    public void onTableRowSelect(ListChangeListener.Change<? extends Integer> change){
+    public void onTableRowSelect(ListChangeListener.Change<? extends Integer> change) {
         isNew = false;
-        vBoxPanel.setVisible(true);
-        vBoxPanel.setManaged(true);
+        setVBoxVisible(true);
+        setEditAble(false);
+        saveButton.setVisible(false);
+        saveButton.setManaged(false);
+        familyButton.setManaged(true);
+        familyButton.setVisible(true);
+        importFeeButton.setVisible(true);
+        importFeeButton.setManaged(true);
+        editButton.setManaged(true);
+        editButton.setVisible(true);
         changeTeacherInfo();
+        displayPhoto();
+    }
+
+    public void displayPhoto() {
+        if (personId == null){
+            MessageDialog.showDialog("未选择教师");
+            return;
+        }
+        try {
+            // 获取当前文件的路径并设置图片文件保存位置
+            File saveDir;
+            String classPath = System.getProperty("java.class.path");
+            if(classPath.endsWith(".jar")){
+                // 生产环境
+                java.net.URI uri = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
+                java.io.File jarFile = new java.io.File(uri);
+                saveDir = jarFile.getParentFile();
+            } else {
+                // 开发环境
+                saveDir = new File(System.getProperty("user.dir"));
+            }
+            // 新建保存图片的文件夹
+            String newDir = "photos";
+            File newDirFile = new File(saveDir, newDir);
+            if(!newDirFile.exists()){
+                if(newDirFile.mkdirs()){
+                    System.out.println("新目录创建成功" + newDirFile.getAbsolutePath());
+                } else {
+                    MessageDialog.showDialog("无法在当前文件夹创建新目录用以下载并保存用户的图片，请检查权限！");
+                }
+            }
+            // 下载图片并保存到指定文件夹
+            DataRequest dataRequest = new DataRequest();
+            dataRequest.add("personId", personId);
+            DataResponse dataResponse = HttpRequestUtil.request("/api/photo/download", dataRequest);
+            if (dataResponse != null){
+                if (dataResponse.getCode() == 0){
+                    System.out.println("下载成功");
+                    try{
+                        Map<String, String> dataMap = (Map<String, String>) dataResponse.getData();
+                        String data = CommonMethod.getString(dataMap, "file");
+                        byte[] fileBytes = java.util.Base64.getDecoder().decode(data);
+
+                        File saveFile = new File(newDirFile, personId + ".jpg");
+
+                        Files.write(saveFile.toPath(), fileBytes);
+                        System.out.println("文件保存成功");
+
+                        String url = saveFile.toURI().toString();
+                        Image image = new Image(url);
+                        if (image.isError()){
+                            System.out.println("图片加载失败");
+                        } else {
+                            System.out.println("图片加载成功");
+                            photoImage.setImage(image);
+                        }
+                    } catch (IOException e) {
+                        MessageDialog.showDialog("照片下载失败，请检查：\n1. 文件权限；\n2. 磁盘空间；\n3. 写入文件夹是否正在被其他程序占用。");
+                        throw new RuntimeException(e);
+                    } catch (IllegalArgumentException e){
+                        System.out.println("无效的本地路径");
+                        Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
+                        photoImage.setImage(image);
+                    }
+                } else {
+                    Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
+                    photoImage.setImage(image);
+                    System.out.println("下载失败");
+                    System.out.println(dataResponse.getMsg());
+                }
+            } else {
+                MessageDialog.showDialog("获取照片失败，请重新启动后端!");
+            }
+        } catch (URISyntaxException e) {
+            MessageDialog.showDialog("无法解析当前文件路径！");
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void changeTeacherInfo(){
@@ -221,11 +356,21 @@ public class teacherController extends ToolController {
         emailField.setText(CommonMethod.getString(form, "email"));
         phoneField.setText(CommonMethod.getString(form, "phone"));
         addressField.setText(CommonMethod.getString(form, "address"));
-//        displayPhoto();
     }
 
     public void onAddButtonClick(ActionEvent actionEvent) {
         this.isNew = true;
+        setEditAble(true);
+        setVBoxVisible(true);
+        saveButton.setVisible(true);
+        saveButton.setManaged(true);
+        saveButton.setText("确定添加");
+        familyButton.setManaged(false);
+        familyButton.setVisible(false);
+        importFeeButton.setVisible(false);
+        importFeeButton.setManaged(false);
+        editButton.setManaged(false);
+        editButton.setVisible(false);
         clearPanel();
     }
 
@@ -307,7 +452,24 @@ public class teacherController extends ToolController {
         }
     }
 
-    public void onPhotoButtonClick(ActionEvent actionEvent) {
+    public void onPhotoButtonClick(ActionEvent actionEvent) throws IOException {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("请选择教师图片");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("图片文件", "*.png", "*.jpg", "*.jpeg")
+        );
+        File file = chooser.showOpenDialog(null);
+        if(file != null) {
+            DataResponse dataResponse = HttpRequestUtil.newUploadFile("/api/photo/upload", file, "file", personId.toString());
+            if (dataResponse.getCode() == 0){
+                MessageDialog.showDialog("上传成功");
+                displayPhoto();
+            }
+        } else {
+            System.out.println("Error to choose jpg files");
+            MessageDialog.showDialog("Error to choose jpg files");
+        }
     }
 
     public void onSaveButtonClick(ActionEvent actionEvent) {
@@ -400,5 +562,19 @@ public class teacherController extends ToolController {
     }
 
     public void onImportFeeButtonClick(ActionEvent actionEvent) {
+    }
+
+    public void onEditButtonClick(ActionEvent actionEvent) {
+        setEditAble(true);
+        setVBoxVisible(true);
+        saveButton.setVisible(true);
+        saveButton.setManaged(true);
+        saveButton.setText("保存");
+        familyButton.setManaged(false);
+        familyButton.setVisible(false);
+        importFeeButton.setVisible(false);
+        importFeeButton.setManaged(false);
+        editButton.setManaged(false);
+        editButton.setVisible(false);
     }
 }

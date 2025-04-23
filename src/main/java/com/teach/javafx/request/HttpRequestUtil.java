@@ -3,15 +3,20 @@ package com.teach.javafx.request;
 import com.teach.javafx.AppStore;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * HttpRequestUtil 后台请求实例程序，主要实践向后台发送请求的方法
@@ -239,6 +244,113 @@ public class HttpRequestUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static DataResponse newUploadFile(String url, File file, String paramName, String personId) throws IOException {
+        // 直接拼接 serverUrl 和传入的 url
+        String URL = serverUrl + url;
+
+        // 构建 multipart/form-data 请求体所需的边界字符串
+        String boundary = "----JavaFXBoundary" + UUID.randomUUID();
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        String charset = "UTF-8";
+
+        // 添加 personId 字段
+        body.write(("--" + boundary + "\r\n").getBytes(charset));
+        body.write(("Content-Disposition: form-data; name=\"personId\"\r\n").getBytes(charset));
+        body.write(("\r\n").getBytes(charset));
+        body.write((personId + "\r\n").getBytes(charset));
+
+        // 添加文件部分
+        body.write(("--" + boundary + "\r\n").getBytes(charset));
+        body.write(("Content-Disposition: form-data; name=\"" + paramName + "\"; filename=\"" + file.getName() + "\"\r\n").getBytes(charset));
+        body.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes(charset));
+        body.write(Files.readAllBytes(file.toPath()));
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(charset));
+
+        // 创建 HttpRequest
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(URL))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .header("Authorization", "Bearer " + AppStore.getJwt().getAccessToken())
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+                .build();
+
+        // 使用 try-with-resources 管理 HttpClient 资源
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return DataResponse.fromJson(response.body());
+            } else {
+                return new DataResponse(response.statusCode(), "文件上传失败", null);
+            }
+        } catch (InterruptedException e) {
+            // 重新设置中断状态
+            Thread.currentThread().interrupt();
+            return new DataResponse(500, "请求被中断: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     *
+     * @param url
+     * @param file
+     * @param paramName
+     * @param fileName
+     * @return
+     * @throws IOException
+     */
+    public static DataResponse newUploadFile1(String url, File file, String paramName, String fileName, String personId) throws IOException {
+        // 直接拼接 serverUrl 和传入的 url
+        String URL = serverUrl + url;
+
+        // 创建HttpClient实例
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 构建multipart/form-data请求体
+        var boundary = new StringBuilder().append("----JavaFXBoundary").append(UUID.randomUUID()).toString();
+        var part = new ByteArrayInputStream(Files.readAllBytes(file.toPath()));
+        var body = new ByteArrayOutputStream();
+        String charset = "UTF-8";
+
+        // 添加 personId 字段
+        body.write(("--" + boundary + "\r\n").getBytes(charset));
+        body.write(("Content-Disposition: form-data; name=\"personId\"\r\n").getBytes(charset));
+        body.write(("\r\n").getBytes(charset));
+        body.write((personId + "\r\n").getBytes(charset));
+
+        // 添加文件部分
+        body.write(("--" + boundary + "\r\n").getBytes(charset));
+        body.write(("Content-Disposition: form-data; name=\"" + paramName + "\"; fileName=\"" + file.getName() + "\"\r\n").getBytes(charset));
+        body.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes(charset));
+        body.write(part.readAllBytes());
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(charset));
+
+        // 创建HttpRequest
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(URL))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .header("Authorization", "Bearer " + AppStore.getJwt().getAccessToken()) // 添加认证信息
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+                .build();
+
+        // 发送请求并处理响应
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return DataResponse.fromJson(response.body());
+            } else {
+                return new DataResponse(response.statusCode(), "文件上传失败", null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new DataResponse(500, "网络异常: " + e.getMessage(), null);
+        } catch (InterruptedException e) {
+            // 重新设置中断状态
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+            return new DataResponse(500, "请求被中断: " + e.getMessage(), null);
+        }
     }
 
     /**
