@@ -1,5 +1,7 @@
 package com.teach.javafx.request;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * DataResponse 前端HTTP请求返回数据对象
  * Integer code 返回代码 0 正确返回 1 错误返回信息
@@ -17,6 +19,16 @@ public class DataResponse {
         this.code = code;
         this.data = data;
         this.msg = msg;
+    }
+
+    public static DataResponse fromJson(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(json, DataResponse.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new DataResponse(1, null, "JSON解析失败");
+        }
     }
 
     public Integer getCode() {
