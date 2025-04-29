@@ -168,8 +168,11 @@ public class AwardPersonController {
             dataRequest.add("studentMap", studentMap);
             dataRequest.add("awardId", awardId.toString());
             DataResponse dataResponse = HttpRequestUtil.request("/api/award/addCandidate", dataRequest);
+
+            if (dataResponse!= null&& dataResponse.getData() == null) {
+                MessageDialog.showDialog("该学生不存在");
+            }
             if (dataResponse != null) {
-                MessageDialog.showDialog("Success!");
                 clearPanel();
                 setTextFieldEditable(false);
                 refreshTableView();
