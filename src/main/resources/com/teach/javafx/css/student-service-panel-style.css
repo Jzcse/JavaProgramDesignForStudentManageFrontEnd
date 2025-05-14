@@ -1,0 +1,12 @@
+.title {
+    -fx-alignment: center;
+    -fx-font-size: 20;
+}
+
+.box {
+    -fx-background-color: red;
+}
+
+.box:hover {
+    -fx-background-color: black;
+}
