@@ -3,26 +3,27 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.effect.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.studentEnd.StudentServiceController" stylesheets="@./css/student-service-panel-style.css">
-    <VBox alignment="CENTER" AnchorPane.topAnchor="100">
-        <FlowPane alignment="CENTER" columnHalignment="CENTER">
-            <HBox styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onLeaveBoxClick">
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.studentEnd.StudentServiceController" stylesheets="@./css/student-service-panel-style.css">
+    <VBox alignment="CENTER" AnchorPane.topAnchor="100" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" spacing="20">
+        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="20" vgap="20" >
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onLeaveBoxClick">
                 <Label prefHeight="30" text="学生请假" styleClass="title">
                     <FlowPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>
                 </Label>
             </HBox>
-            <HBox styleClass="box" prefHeight="150" prefWidth="200">
-                <Label prefHeight="30" text="学生信息查询" styleClass="title">
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200">
+                <Label prefHeight="30" text="其他功能待定" styleClass="title">
                     <FlowPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>
                 </Label>
             </HBox>
-            <HBox styleClass="box" prefHeight="150" prefWidth="200">
-                <Label prefHeight="30" text="1" styleClass="title">
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200">
+                <Label prefHeight="30" text="其他功能待定" styleClass="title">
                     <FlowPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>

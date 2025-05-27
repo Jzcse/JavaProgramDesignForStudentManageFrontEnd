@@ -78,6 +78,23 @@ public class StudentServiceLeaveRequestController extends ToolController {
             }
             return new SimpleStringProperty(result);
         });
+        statusColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    switch (item) {
+                        case "未处理" -> setStyle("-fx-text-fill: #BBBBBB;");
+                        case "被拒绝" -> setStyle("-fx-text-fill: #DC3545;");
+                        case "已同意" -> setStyle("-fx-text-fill: #28A745;");
+                    }
+                }
+            }
+        });
         requestTimeColumn.setCellValueFactory(cellData -> {
             String requestTime = cellData.getValue().get("requestTime");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);

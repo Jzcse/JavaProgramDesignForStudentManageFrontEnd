@@ -4,9 +4,9 @@
 }
 
 .box {
-    -fx-background-color: red;
+    -fx-background-color: #F8F9FA;
 }
 
 .box:hover {
-    -fx-background-color: black;
+    -fx-background-color: #E9EDF2;
 }
