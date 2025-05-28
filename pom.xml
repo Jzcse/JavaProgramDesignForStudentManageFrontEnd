@@ -54,6 +54,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
         </dependency>
+            <!-- ... 前端美化的依赖 ... -->
+            <dependency>
+                <groupId>org.kordamp.bootstrapfx</groupId>
+                <artifactId>bootstrapfx-core</artifactId>
+                <version>0.4.0</version>
+            </dependency>
     </dependencies>
 
     <build>
