@@ -1,5 +1,8 @@
 package com.teach.javafx.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.read.listener.ReadListener;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.base.MessageDialog;
 import com.teach.javafx.util.CommonMethod;
@@ -8,19 +11,33 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.MapValueFactory;
 import com.teach.javafx.request.HttpRequestUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import com.teach.javafx.request.DataRequest;
 import com.teach.javafx.request.DataResponse;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,15 +66,6 @@ public class CourseController {
     private TableColumn<Map,String> dayOfWeekColumn;
     @FXML
     private TableColumn<Map,String> timeColumn;
-    @FXML
-    private TableColumn<Map,FlowPane> operateColumn;
-    @FXML
-    private Pagination pagination;
-    @FXML
-    private ImageView courseImageView;
-    @FXML
-    private Button photoButton;
-
 
     @FXML
     private TextField courseNumField;
@@ -156,6 +164,7 @@ public class CourseController {
 
     @FXML
     public void initialize() {
+
         numColumn.setCellValueFactory(new MapValueFactory("courseId"));
         numColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         numColumn.setOnEditCommit(event -> {
@@ -412,8 +421,78 @@ public class CourseController {
             MessageDialog.showDialog("无法打开课程安排窗口：" + e.getMessage());
         }
     }
+    @FXML
+    private void onImportButtonClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择Excel文件");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Excel Files", "*.xlsx", "*.xls")
+        );
+        File file = fileChooser.showOpenDialog(dataTableView.getScene().getWindow());
+        if (file != null) {
+            try {
+                List<Map<String, Object>> courseDataList = readExcelData(file);
+                if (courseDataList != null && !courseDataList.isEmpty()) {
+                    DataRequest req = new DataRequest();
+                    req.add("courseList", courseDataList);
+                    DataResponse res = HttpRequestUtil.request("/api/course/importCourses", req);
+                    if (res != null && res.getCode() == 0) {
+                        MessageDialog.showDialog("导入成功，共导入 " + courseDataList.size() + " 条课程数据");
+                        onQueryButtonClick(); // 刷新表格
+                    } else {
+                        MessageDialog.showDialog("导入失败: " + (res != null ? res.getMsg() : "请求失败"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                MessageDialog.showDialog("导入失败: " + e.getMessage());
+            }
+        }
+    }
+
+    private List<Map<String, Object>> readExcelData(File file) throws Exception {
+        List<Map<String, Object>> dataList = new ArrayList<>();
+
+        EasyExcel.read(file, new ReadListener<Map<Integer, String>>() {
+            @Override
+            public void invoke(Map<Integer, String> rowData, AnalysisContext context) {
+                // 跳过表头
+                if (context.readRowHolder().getRowIndex() == 0) {
+                    return;
+                }
+
+                Map<String, Object> courseMap = new HashMap<>();
+                courseMap.put("num", rowData.get(0)); // 第一列是课程编号
+                courseMap.put("name", rowData.get(1)); // 第二列是课程名称
+                courseMap.put("credit", rowData.get(2)); // 第三列是学分
+                courseMap.put("preCourseName", rowData.get(3)); // 第四列是先修课程
+                courseMap.put("classroom", rowData.get(4)); // 第五列是教室
+                courseMap.put("dayOfWeek", rowData.get(5)); // 第六列是星期
+                courseMap.put("time", rowData.get(6)); // 第七列是时间
+
+                dataList.add(courseMap);
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext context) {
+                // 所有数据解析完成
+            }
+        }).sheet().doRead();
+
+        return dataList;
+    }
+
+
+
+
+
 
 
 }
+
+
+
+
+
 
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.teach.javafx.controller.CourseChildController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <!-- 顶部：星期一到星期天 -->
+    <top>
+        <HBox fx:id="weekDaysHBox" alignment="CENTER" spacing="10.0">
+            <padding>
+                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- 左侧：时间 -->
+    <left>
+        <VBox fx:id="timeVBox" alignment="CENTER" spacing="10.0">
+            <padding>
+                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+            </padding>
+        </VBox>
+    </left>
+
+    <!-- 中间：课程表格 -->
+    <center>
+        <TableView fx:id="courseTableView">
+            <columns>
+                <TableColumn fx:id="timeColumn" text="时间" />
+                <TableColumn fx:id="mondayColumn" text="星期一" />
+                <TableColumn fx:id="tuesdayColumn" text="星期二" />
+                <TableColumn fx:id="wednesdayColumn" text="星期三" />
+                <TableColumn fx:id="thursdayColumn" text="星期四" />
+                <TableColumn fx:id="fridayColumn" text="星期五" />
+                <TableColumn fx:id="saturdayColumn" text="星期六" />
+                <TableColumn fx:id="sundayColumn" text="星期日" />
+            </columns>
+        </TableView>
+    </center>
+
+</BorderPane>
