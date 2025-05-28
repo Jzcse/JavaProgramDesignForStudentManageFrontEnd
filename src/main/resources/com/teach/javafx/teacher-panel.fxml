@@ -27,6 +27,11 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>
                 </Button>
+                <Button fx:id="exportPdfButton" mnemonicParsing="false" onAction="#exportTeacherResume" text="导出PDF简历">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                </Button>
             </FlowPane>
             <Pane HBox.hgrow="ALWAYS" />
             <FlowPane alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="400.0" BorderPane.alignment="CENTER">

@@ -6,7 +6,10 @@ module com.teach.javafx {
     requires java.net.http;
     requires jdk.security.jgss;
     requires com.fasterxml.jackson.databind;
+    requires org.apache.pdfbox;
     requires easyexcel.core;
+    requires kernel;
+    requires layout;
 
     opens com.teach.javafx to javafx.fxml;
     opens com.teach.javafx.request to com.google.gson, javafx.fxml;
