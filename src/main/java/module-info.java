@@ -19,5 +19,8 @@ module com.teach.javafx {
     exports com.teach.javafx.controller.base;
     exports com.teach.javafx.request;
     exports com.teach.javafx.util;
-
+    exports com.teach.javafx.controller.studentEnd;
+    exports com.teach.javafx.controller.inner;
+    opens com.teach.javafx.controller.studentEnd to com.google.gson, javafx.fxml;
+    opens com.teach.javafx.controller.inner to com.google.gson, javafx.fxml;
 }

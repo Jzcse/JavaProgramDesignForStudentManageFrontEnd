@@ -182,7 +182,7 @@ public class StudentController extends ToolController {
             studentList = (ArrayList<Map>) res.getData();
         }
         //设置列值工程属性
-        numColumn.setCellValueFactory(new MapValueFactory("num"));
+        numColumn.setCellValueFactory(new MapValueFactory<>("num"));
         nameColumn.setCellValueFactory(new MapValueFactory<>("name"));
         deptColumn.setCellValueFactory(new MapValueFactory<>("dept"));
         majorColumn.setCellValueFactory(new MapValueFactory<>("major"));
