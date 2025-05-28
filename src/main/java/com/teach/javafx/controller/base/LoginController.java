@@ -2,6 +2,7 @@ package com.teach.javafx.controller.base;
 
 import com.teach.javafx.AppStore;
 import com.teach.javafx.MainApplication;
+import com.teach.javafx.controller.studentEnd.GlobalSession;
 import com.teach.javafx.request.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,6 +59,7 @@ public class LoginController {
             Scene scene = new Scene(fxmlLoader.load(), -1, -1);
             AppStore.setMainFrameController((MainFrameController) fxmlLoader.getController());
             MainApplication.resetStage("教学管理系统", scene);
+            GlobalSession.getInstance().setNum(username);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
