@@ -4,13 +4,17 @@ import com.teach.javafx.AppStore;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.studentEnd.GlobalSession;
 import com.teach.javafx.request.*;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
+import javafx.util.Duration;
+
 import java.io.IOException;
+import java.io.SequenceInputStream;
 
 /**
  * LoginController 登录交互控制类 对应 base/login-view.fxml
@@ -37,8 +41,9 @@ public class LoginController {
         passwordField.setText("123456");
 //        vbox.setId("min");  // id选择器 #
 //        vbox.getStyleClass().add("min");  类选择器 .
-        vbox.setStyle("-fx-background-image: url('shanda1.jpg'); -fx-background-repeat: no-repeat; -fx-background-size: cover;");  //inline选择器
+        vbox.setStyle("-fx-background-repeat: no-repeat; -fx-background-size: cover;");  //inline选择器
 //        loginButton.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+
     }
 
     /**

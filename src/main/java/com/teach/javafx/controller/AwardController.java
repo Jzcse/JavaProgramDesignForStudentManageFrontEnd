@@ -118,29 +118,21 @@ public class AwardController extends ToolController {
     }
 
     public void changeAwardInfo() {
-        Map<String, String> form = dataTableView.getSelectionModel().getSelectedItem();
-        if (form == null) {
+        Map<String, String> selectedRow = dataTableView.getSelectionModel().getSelectedItem();
+        if (selectedRow == null) {
             clearPanel();
             return;
         }
 
-        currentAwardId = CommonMethod.getInteger(form, "awardId");
-        DataRequest dataRequest = new DataRequest();
-        dataRequest.add("awardId", currentAwardId);
-        DataResponse res = HttpRequestUtil.request("/api/award/getAwardList", dataRequest);
+        // 直接从选中的行数据中获取信息并设置到对应的组件中
+        awardSearchNameTextField.setText(selectedRow.get("awardName"));
+        awardNameField.setText(selectedRow.get("awardName"));
+        awardTypeField.setValue(selectedRow.get("awardType"));
+        awardLevelField.setValue(selectedRow.get("awardLevel"));
+        awardSizeField.setText(selectedRow.get("awardSize"));
+        awardTimeField.setText(selectedRow.get("awardTime"));
 
-        if (res.getCode() != 0) {
-            MessageDialog.showDialog(res.getMsg());
-            return;
-        }
-
-        form = (Map) res.getData();
-        awardSearchNameTextField.setText(CommonMethod.getString(form, "awardName"));
-        awardNameField.setText(CommonMethod.getString(form, "awardName"));
-        awardTypeField.setValue(CommonMethod.getString(form, "awardType"));
-        awardLevelField.setValue(CommonMethod.getString(form, "awardLevel"));
-        awardSizeField.setText(CommonMethod.getString(form, "awardSize"));
-        awardTimeField.setText(CommonMethod.getString(form, "awardTime"));
+        currentAwardId = CommonMethod.getInteger(selectedRow, "awardId");
     }
 
     @FXML
@@ -278,8 +270,9 @@ public class AwardController extends ToolController {
             MessageDialog.showDialog(dataResponse != null ? dataResponse.getMsg() : "获取失败");
         }
     }
+
     @FXML
-    private void openChildWindow(Integer currentAwardId) throws Exception  {
+    private void openChildWindow(Integer currentAwardId) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/teach/javafx/child-award-panel.fxml"));
         Parent root = loader.load();
         Stage stage = new Stage();
@@ -294,5 +287,4 @@ public class AwardController extends ToolController {
         controller.initialize(currentAwardId);
         stage.showAndWait();
     }
-
 }

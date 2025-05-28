@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.teacherEnd.TeacherInfoController">
+    <!-- 顶部区域，显示教师基本信息 -->
+    <top>
+        <VBox spacing="10" padding="20">
+            <Label text="教师信息" font="20px Arial Bold"/>
+            <HBox spacing="20">
+                <Label text="姓名:"/>
+                <TextField fx:id="teacherNameField" editable="false"/>
+                <Label text="工号:"/>
+                <TextField fx:id="teacherIdField" editable="false"/>
+            </HBox>
+            <HBox spacing="20">
+                <Label text="职称:"/>
+                <TextField fx:id="titleField" editable="false"/>
+                <Label text="部门:"/>
+                <TextField fx:id="departmentField" editable="false"/>
+            </HBox>
+        </VBox>
+    </top>
+    <!-- 中心区域，显示教师所授课程表格 -->
+    <center>
+        <VBox spacing="10" padding="20">
+            <Label text="所授课程" font="16px Arial Bold"/>
+            <TableView fx:id="courseTableView" editable="false">
+                <columns>
+                    <TableColumn text="课程编号" fx:id="courseIdColumn"/>
+                    <TableColumn text="课程名称" fx:id="courseNameColumn"/>
+                    <TableColumn text="学分" fx:id="creditColumn"/>
+                    <TableColumn text="上课时间" fx:id="timeColumn"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>
