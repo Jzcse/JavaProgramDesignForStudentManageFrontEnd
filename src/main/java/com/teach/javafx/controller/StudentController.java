@@ -1,9 +1,18 @@
 package com.teach.javafx.controller;
 
-import com.sun.security.jgss.AuthorizationDataEntry;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.properties.*;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.base.LocalDateStringConverter;
 import com.teach.javafx.controller.base.ToolController;
+import com.teach.javafx.models.Student;
 import com.teach.javafx.request.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,10 +36,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.stage.FileChooser;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
 
-import java.io.ByteArrayInputStream;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -748,4 +766,263 @@ public class StudentController extends ToolController {
         }
     }
 
+
+
+    public static void generateStudentPdf(List<Student> students, String filePath) throws IOException {
+        File file = new File(filePath);
+        file.getParentFile().mkdirs();
+
+        try (PdfWriter writer = new PdfWriter(file);
+             PdfDocument pdf = new PdfDocument(writer);
+             Document document = new Document(pdf, PageSize.A4)) {
+
+            document.setMargins(30, 30, 30, 30);
+
+            DeviceRgb primaryColor = new DeviceRgb(51, 103, 214);
+            DeviceRgb textColor = new DeviceRgb(33, 33, 33);
+            DeviceRgb titleColor = new DeviceRgb(26, 35, 126);
+
+            PdfFont regularFont = PdfFontFactory.createFont(
+                    "STSong-Light",
+                    "UniGB-UCS2-H",
+                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+            );
+            PdfFont boldFont = PdfFontFactory.createFont(
+                        "STSongStd-Light",
+                        "UniGB-UCS2-H",
+                        PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+                );
+            PdfFont headerFont = boldFont;
+
+            for (Student student : students) {
+                Div resumeContainer = new Div()
+                        .setBorder(new SolidBorder(1))
+                        .setPadding(20)
+                        .setMarginBottom(20);
+
+                Table headerTable = new Table(new float[]{25, 75})
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setMarginBottom(15);
+
+                Cell photoCell = new Cell()
+                        .setBorder(Border.NO_BORDER)
+                        .setPadding(5)
+                        .setHeight(100);
+
+                Div photoPlaceholder = new Div()
+                        .setHeight(90)
+                        .setWidth(80)
+                        .setBorder(new SolidBorder(0.8f));
+
+                photoCell.add(photoPlaceholder);
+                headerTable.addCell(photoCell);
+
+                Cell infoCell = new Cell()
+                        .setBorder(Border.NO_BORDER)
+                        .setPadding(5)
+                        .setPaddingLeft(15);
+
+                Paragraph name = new Paragraph(student.getName())
+                        .setFont(headerFont)
+                        .setFontSize(22)
+                        .setFontColor(titleColor)
+                        .setMarginBottom(8);
+                infoCell.add(name);
+
+                Paragraph basicInfo = new Paragraph()
+                        .setFont(regularFont)
+                        .setFontSize(11)
+                        .setFontColor(textColor);
+
+                basicInfo.add(new Text(student.getType() + " | "));
+                basicInfo.add(new Text("学号: " + student.getNum() + " | "));
+                basicInfo.add(new Text("专业: " + student.getMajor() + " | "));
+                basicInfo.add(new Text("班级: " + student.getClassName()));
+
+                infoCell.add(basicInfo);
+                headerTable.addCell(infoCell);
+
+                resumeContainer.add(headerTable);
+
+                Div personalInfoDiv = new Div()
+                        .setPadding(5)
+                        .setMarginTop(10);
+
+                personalInfoDiv.add(createSectionTitle("个人资料", boldFont, titleColor));
+
+                Table personalInfoTable = new Table(2)
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setMarginTop(3);
+
+                personalInfoTable.addCell(createInfoCell("性别", student.getGenderName(), regularFont, textColor));
+                personalInfoTable.addCell(createInfoCell("生日", student.getBirthday(), regularFont, textColor));
+
+                personalInfoDiv.add(personalInfoTable);
+                resumeContainer.add(personalInfoDiv);
+
+                // 联系方式部分
+                Div contactDiv = new Div()
+                        .setPadding(5)
+                        .setMarginTop(10);
+
+                contactDiv.add(createSectionTitle("联系方式", boldFont, titleColor));
+
+                Table contactTable = new Table(2)
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setMarginTop(3);
+
+                contactTable.addCell(createInfoCell("电话", student.getPhone(), regularFont, textColor));
+                contactTable.addCell(createInfoCell("邮箱", student.getEmail(), regularFont, textColor));
+                contactTable.addCell(createInfoCell("地址", student.getAddress(), regularFont, textColor));
+
+                contactDiv.add(contactTable);
+                resumeContainer.add(contactDiv);
+
+                // 教育背景部分
+                Div educationDiv = new Div()
+                        .setPadding(5)
+                        .setMarginTop(10);
+
+                educationDiv.add(createSectionTitle("教育背景", boldFont, titleColor));
+
+                Table educationTable = new Table(2)
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setMarginTop(3);
+
+                educationTable.addCell(createInfoCell("学院/部门", student.getDept(), regularFont, textColor));
+                educationTable.addCell(createInfoCell("专业", student.getMajor(), regularFont, textColor));
+                educationTable.addCell(createInfoCell("班级", student.getClassName(), regularFont, textColor));
+
+                educationDiv.add(educationTable);
+                resumeContainer.add(educationDiv);
+
+                Div introDiv = new Div()
+                        .setPadding(5)
+                        .setMarginTop(25);
+
+                introDiv.add(createSectionTitle("个人简介及获奖情况", boldFont, titleColor));
+                String introduction = student.getIntroduce() != null ? student.getIntroduce() : "暂无简介";
+                Paragraph introPara = new Paragraph(introduction)
+                        .setFont(regularFont)
+                        .setFontSize(11)
+                        .setTextAlignment(TextAlignment.JUSTIFIED)
+                        .setMultipliedLeading(1.5f)
+                        .setMarginTop(15);
+
+                introPara.setMarginBottom(170);
+                introDiv.add(introPara);
+
+                resumeContainer.add(introDiv);
+                document.add(resumeContainer);
+
+                if (students.indexOf(student) < students.size() - 1) {
+                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                }
+            }
+
+            Paragraph footer = new Paragraph("生成时间: " +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .setFont(regularFont)
+                    .setFontSize(9)
+                    .setFontColor(new DeviceRgb(117, 117, 117))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginTop(3); // 减小页脚与内容的间距
+            document.add(footer);
+        }
+    }
+
+    private static Paragraph createSectionTitle(String title, PdfFont font, DeviceRgb color) {
+        return new Paragraph(title)
+                .setFont(font)
+                .setFontSize(13)
+                .setFontColor(color)
+                .setMarginBottom(5)
+                .setBorderBottom(new SolidBorder(new DeviceRgb(224, 224, 224), 0.7f))
+                .setPaddingBottom(3);
+    }
+
+    private static Cell createInfoCell(String label, String value, PdfFont font, DeviceRgb textColor) {
+        if (value == null || value.isEmpty()) {
+            value = "暂无信息";
+        }
+
+        Paragraph p = new Paragraph()
+                .setFont(font)
+                .setFontSize(10)
+                .setMarginBottom(1);
+
+        p.add(new Text(label + ": ").setFontColor(new DeviceRgb(97, 97, 97)));
+        p.add(new Text(value).setFontColor(textColor));
+
+        Cell cell = new Cell()
+                .setBorder(Border.NO_BORDER)
+                .setPadding(2);
+
+        cell.add(p);
+        return cell;
+    }
+
+
+
+    @FXML
+    public void onExportPdfButtonClick() throws IOException {
+        Map<String, Object> form = dataTableView.getSelectionModel().getSelectedItem();
+        if (form == null) {
+            MessageDialog.showDialog("没有选择，不能导出");
+            return;
+        }
+        String targetStudentNum = CommonMethod.getString(form, "num");
+        DataRequest req = new DataRequest();
+        req.add("numName", targetStudentNum);
+        DataResponse res = HttpRequestUtil.request("/api/student/getStudentList", req);
+        if (res != null && res.getCode() == 0) {
+            ArrayList<Map<String, Object>> students = (ArrayList<Map<String, Object>>) res.getData();
+            if (!students.isEmpty()) {
+                Map<String, Object> studentMap = students.get(0);
+
+                Student targetStudent = new Student();
+                targetStudent.setPersonId(CommonMethod.getInteger(studentMap, "personId"));
+                targetStudent.setNum(CommonMethod.getString(studentMap, "num"));
+                targetStudent.setName(CommonMethod.getString(studentMap, "name"));
+                targetStudent.setType(CommonMethod.getString(studentMap, "type"));
+                targetStudent.setDept(CommonMethod.getString(studentMap, "dept"));
+                targetStudent.setCard(CommonMethod.getString(studentMap, "card"));
+                targetStudent.setGender(CommonMethod.getString(studentMap, "gender"));
+                targetStudent.setGenderName(CommonMethod.getString(studentMap, "genderName"));
+                targetStudent.setBirthday(CommonMethod.getString(studentMap, "birthday"));
+                targetStudent.setEmail(CommonMethod.getString(studentMap, "email"));
+                targetStudent.setPhone(CommonMethod.getString(studentMap, "phone"));
+                targetStudent.setAddress(CommonMethod.getString(studentMap, "address"));
+                targetStudent.setIntroduce(CommonMethod.getString(studentMap, "introduce"));
+                targetStudent.setMajor(CommonMethod.getString(studentMap, "major"));
+                targetStudent.setClassName(CommonMethod.getString(studentMap, "className"));
+
+                List<Student> studentList = new ArrayList<>();
+                studentList.add(targetStudent);
+
+                FileChooser fileDialog = new FileChooser();
+                fileDialog.setTitle("请选择导出文件路径");
+                fileDialog.setInitialDirectory(new File("D:/"));
+                fileDialog.getExtensionFilters().addAll();
+
+                File selectedFile = fileDialog.showSaveDialog(null);
+                if (selectedFile != null) {
+                    String filePath = selectedFile.getAbsolutePath();
+                    if (!filePath.toLowerCase().endsWith(".pdf")) {
+                        filePath += ".pdf";
+                    }
+                    generateStudentPdf(studentList, filePath);
+                    MessageDialog.showDialog("导出成功！");
+                }
+            } else {
+                MessageDialog.showDialog("未找到对应的学生信息");
+            }
+        } else {
+            if (res != null) {
+                MessageDialog.showDialog(res.getMsg());
+            } else {
+                MessageDialog.showDialog("获取学生信息失败");
+            }
+        }
+    }
 }
