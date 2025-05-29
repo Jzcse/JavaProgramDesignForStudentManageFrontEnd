@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.teach.javafx.controller.studentEnd.inner.CourseChooseResultInnerController" prefHeight="400.0" prefWidth="600.0">
+    <center>
+        <TableView fx:id="courseTableView">
+            <columns>
+                <TableColumn text="课序号" fx:id="courseNumColumn" prefWidth="100"/>
+                <TableColumn text="课程名称" fx:id="courseNameColumn" prefWidth="90" />
+                <TableColumn text="学分" fx:id="courseCreditColumn" prefWidth="30" />
+                <TableColumn text="上课教室" fx:id="courseClassroomColumn" prefWidth="90" />
+                <TableColumn text="上课星期" fx:id="courseDayOfWeekColumn" prefWidth="90" />
+                <TableColumn text="上课时间段" fx:id="courseTimeColumn" prefWidth="90" />
+                <TableColumn text="前置课程" fx:id="coursePreCourseName" prefWidth="90" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

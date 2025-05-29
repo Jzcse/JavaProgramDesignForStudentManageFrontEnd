@@ -15,15 +15,15 @@
                     </FlowPane.margin>
                 </Label>
             </HBox>
-            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200">
-                <Label prefHeight="30" text="其他功能待定" styleClass="title">
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onCourseChooseBoxClick">
+                <Label prefHeight="30" text="选课中心" styleClass="title">
                     <FlowPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>
                 </Label>
             </HBox>
-            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200">
-                <Label prefHeight="30" text="其他功能待定" styleClass="title">
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onInfoBoxClick">
+                <Label prefHeight="30" text="个人信息管理" styleClass="title">
                     <FlowPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </FlowPane.margin>

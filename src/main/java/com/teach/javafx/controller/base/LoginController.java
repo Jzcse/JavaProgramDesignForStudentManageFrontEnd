@@ -4,6 +4,7 @@ import com.teach.javafx.AppStore;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.studentEnd.GlobalSession;
 import com.teach.javafx.request.*;
+import com.teach.javafx.util.CommonMethod;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,8 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.SequenceInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * LoginController 登录交互控制类 对应 base/login-view.fxml
@@ -65,6 +68,26 @@ public class LoginController {
             AppStore.setMainFrameController((MainFrameController) fxmlLoader.getController());
             MainApplication.resetStage("教学管理系统", scene);
             GlobalSession.getInstance().setNum(username);
+            if (username.equals("admin")){
+                // TODO
+            } else {
+                DataRequest dataRequest = new DataRequest();
+                Map<String, String> map = new HashMap<>();
+                map.put("num", username);
+                dataRequest.add("course", map);
+                DataResponse dataResponse = HttpRequestUtil.request("/api/course/getRoleId", dataRequest);
+                if (dataResponse != null) {
+                    if (dataResponse.getCode() == 0) {
+                        Map<String, String> form = (Map<String, String>) dataResponse.getData();
+                        GlobalSession.getInstance().setPersonId(CommonMethod.getString(form, "personId"));
+                        GlobalSession.getInstance().setStudentId(CommonMethod.getString(form, "studentId"));
+                        System.err.println("success");
+                        System.err.println(GlobalSession.getInstance().getStudentId());
+                    }
+                } else {
+                    System.err.println("error");
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
