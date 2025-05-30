@@ -35,7 +35,7 @@
     <right>
         <VBox alignment="TOP_CENTER" prefHeight="1200" BorderPane.alignment="CENTER_RIGHT">
             <Label alignment="CENTER" prefWidth="300" styleClass="label-title" text="当前课表" />
-            <TableView fx:id="curriculumView" fixedCellSize="40" styleClass="table">
+            <TableView fx:id="curriculumView" fixedCellSize="50" styleClass="table">
                 <columns>
                     <TableColumn fx:id="timeColumn" text="时段" />
                     <TableColumn fx:id="monday" text="星期一" />

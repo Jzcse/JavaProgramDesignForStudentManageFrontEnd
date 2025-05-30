@@ -26,7 +26,7 @@ import java.util.UUID;
 public class HttpRequestUtil {
     private static Gson gson = new Gson();
     private static HttpClient client = HttpClient.newHttpClient();
-    public static String serverUrl = "http://10.27.138.202:22223";
+    public static String serverUrl = "http://localhost:22223";
 //    public static String serverUrl = "http://202.194.7.29:22222";
 
     /**

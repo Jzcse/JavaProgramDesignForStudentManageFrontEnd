@@ -74,15 +74,17 @@ public class LoginController {
                 DataRequest dataRequest = new DataRequest();
                 Map<String, String> map = new HashMap<>();
                 map.put("num", username);
-                dataRequest.add("course", map);
-                DataResponse dataResponse = HttpRequestUtil.request("/api/course/getRoleId", dataRequest);
+                dataRequest.add("role", map);
+                DataResponse dataResponse = HttpRequestUtil.request("/api/base/getRoleId", dataRequest);
                 if (dataResponse != null) {
                     if (dataResponse.getCode() == 0) {
                         Map<String, String> form = (Map<String, String>) dataResponse.getData();
-                        GlobalSession.getInstance().setPersonId(CommonMethod.getString(form, "personId"));
-                        GlobalSession.getInstance().setStudentId(CommonMethod.getString(form, "studentId"));
-                        System.err.println("success");
-                        System.err.println(GlobalSession.getInstance().getStudentId());
+                        String indetify = CommonMethod.getString(form, "identify");
+                        if (indetify.equals("1")) {
+                            GlobalSession.getInstance().setTeacherId(CommonMethod.getString(form, "teacherId"));
+                        } else {
+                            GlobalSession.getInstance().setStudentId(CommonMethod.getString(form, "studentId"));
+                        }
                     }
                 } else {
                     System.err.println("error");
