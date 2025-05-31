@@ -1,28 +1,35 @@
-package com.teach.javafx.controller.studentEnd.inner;
+package com.teach.javafx.controller.teacherEnd.inner;
 
 import com.teach.javafx.controller.base.MessageDialog;
-import com.teach.javafx.controller.base.ToolController;
 import com.teach.javafx.controller.studentEnd.GlobalSession;
 import com.teach.javafx.request.DataRequest;
 import com.teach.javafx.request.DataResponse;
 import com.teach.javafx.request.HttpRequestUtil;
 import com.teach.javafx.util.CommonMethod;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CourseChooseDetailController extends ToolController {
+public class CourseChooseDetailController {
+    @FXML
+    private Label num;
+    @FXML
+    private Label name;
+    @FXML
+    private Label credit;
+    @FXML
+    private Label preCourse;
+    @FXML
+    private Label classname;
+    @FXML
+    private Label day;
+    @FXML
+    private Label time;
 
-    public Label num;
-    public Label name;
-    public Label credit;
-    public Label preCourse;
-    public Label classname;
-    public Label day;
-    public Label time;
     private String courseId;
 
     public void initialize(String courseId) {
@@ -53,29 +60,25 @@ public class CourseChooseDetailController extends ToolController {
         } else {
             MessageDialog.showDialog("请检查网络连接！");
         }
-
     }
 
     public void onSelectButtonClick(ActionEvent actionEvent) {
         DataRequest dataRequest = new DataRequest();
         Map<String, String> map = new HashMap<>();
         map.put("courseId", courseId);
-        map.put("studentId", GlobalSession.getInstance().getStudentId());
+        map.put("teacherId", GlobalSession.getInstance().getTeacherId());
         dataRequest.add("selection", map);
-        DataResponse dataResponse = HttpRequestUtil.request("/api/course/selectCourse", dataRequest);
-        if(dataResponse != null) {
-            if(dataResponse.getCode() == 0) {
-                MessageDialog.showDialog("选课成功！");
+        DataResponse dataResponse = HttpRequestUtil.request("/api/course/addCourseTeacher", dataRequest);
+        if (dataResponse != null) {
+            if (dataResponse.getCode() == 0) {
+                MessageDialog.showDialog("任课成功!");
                 Stage stage = (Stage) num.getScene().getWindow();
                 stage.close();
             } else {
                 MessageDialog.showDialog(dataResponse.getMsg());
-                Stage stage = (Stage) num.getScene().getWindow();
-                stage.close();
             }
         } else {
-            MessageDialog.showDialog("选课失败！");
+            MessageDialog.showDialog("请检查网络连接!");
         }
-
     }
 }

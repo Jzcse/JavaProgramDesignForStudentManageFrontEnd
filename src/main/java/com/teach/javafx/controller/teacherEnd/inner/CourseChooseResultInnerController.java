@@ -1,4 +1,4 @@
-package com.teach.javafx.controller.studentEnd.inner;
+package com.teach.javafx.controller.teacherEnd.inner;
 
 import com.teach.javafx.controller.base.MessageDialog;
 import com.teach.javafx.controller.base.ToolController;
@@ -17,12 +17,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.util.Callback;
 
+import javax.tools.Tool;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CourseChooseResultInnerController extends ToolController {
-
     @FXML
     private TableView<Map<String, String>> courseTableView;
     @FXML
@@ -40,15 +40,14 @@ public class CourseChooseResultInnerController extends ToolController {
     @FXML
     private TableColumn<Map<String, String>, String> coursePreCourseName;
 
-    private String studentId;
+    private String teacherId;
     private ArrayList<Map<String, String>> courseList = new ArrayList<>();
     private ObservableList<Map<String, String>> courseObservableList = FXCollections.observableArrayList();
 
     public void initialize() {
-        //
-        this.studentId = GlobalSession.getInstance().getStudentId();
+        teacherId = GlobalSession.getInstance().getTeacherId();
 
-        // 列值工程属性
+        // 列值属性
         courseClassroomColumn.setCellValueFactory(new MapValueFactory("classroom"));
         courseNameColumn.setCellValueFactory(new MapValueFactory("name"));
         courseTimeColumn.setCellValueFactory(new MapValueFactory("time"));
@@ -64,15 +63,14 @@ public class CourseChooseResultInnerController extends ToolController {
 
         getData();
         setTableView();
-
     }
 
     private void getData() {
         DataRequest dataRequest = new DataRequest();
         Map<String, String> map = new HashMap<>();
-        map.put("studentId", studentId);
+        map.put("teacherId", teacherId);
         dataRequest.add("selection", map);
-        DataResponse dataResponse = HttpRequestUtil.request("/api/course/getStudentCourseListResult", dataRequest);
+        DataResponse dataResponse = HttpRequestUtil.request("/api/course/getTeacherCourseListResult", dataRequest);
         if (dataResponse != null) {
             if (dataResponse.getCode() == 0) {
                 courseList = (ArrayList<Map<String, String>>) dataResponse.getData();
@@ -97,17 +95,17 @@ public class CourseChooseResultInnerController extends ToolController {
             private final Button button = new Button("退课");
             {
                 button.setOnAction(event -> {
-                    Integer choice = MessageDialog.choiceDialog("确定要退选这门课程吗？");
+                    Integer choice = MessageDialog.choiceDialog("确定要退任这门课程吗？");
                     if (choice == 3) {
                         Map<String, String> rowData = getTableView().getItems().get(getIndex());
                         String courseId = CommonMethod.getString(rowData, "courseId");
-                        String studentId = GlobalSession.getInstance().getStudentId();
+                        String teacherId = GlobalSession.getInstance().getTeacherId();
                         DataRequest dataRequest = new DataRequest();
                         Map<String, String> map = new HashMap<>();
                         map.put("courseId", courseId);
-                        map.put("studentId", studentId);
+                        map.put("teacherId", teacherId);
                         dataRequest.add("selection", map);
-                        DataResponse dataResponse = HttpRequestUtil.request("/api/course/dropCourse", dataRequest);
+                        DataResponse dataResponse = HttpRequestUtil.request("/api/course/deleteCourseTeacher", dataRequest);
                         if (dataResponse != null ) {
                             if (dataResponse.getCode() == 0){
                                 MessageDialog.showDialog("退课成功!");
@@ -134,4 +132,5 @@ public class CourseChooseResultInnerController extends ToolController {
             }
         };
     }
+
 }

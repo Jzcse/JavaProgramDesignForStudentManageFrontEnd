@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.teach.javafx.controller.teacherEnd.TeacherServiceController"
+            prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@../css/teacher-end/teacher-service.css">
+    <VBox alignment="CENTER" AnchorPane.topAnchor="100" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" spacing="20">
+        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="20" vgap="20" >
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onCourseChooseBoxClick">
+                <Label prefHeight="30" text="任课中心" styleClass="title">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                </Label>
+            </HBox>
+            <HBox alignment="CENTER" styleClass="box" prefHeight="150" prefWidth="200" onMouseClicked="#onInfoBoxClick">
+                <Label prefHeight="30" text="个人信息管理" styleClass="title">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </FlowPane.margin>
+                </Label>
+            </HBox>
+        </FlowPane>
+    </VBox>
+</AnchorPane>
