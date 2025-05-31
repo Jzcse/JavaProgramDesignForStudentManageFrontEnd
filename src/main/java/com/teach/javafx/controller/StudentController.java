@@ -12,6 +12,8 @@ import com.itextpdf.layout.properties.*;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.base.LocalDateStringConverter;
 import com.teach.javafx.controller.base.ToolController;
+import com.teach.javafx.models.Award;
+import com.teach.javafx.models.AwardPerson;
 import com.teach.javafx.models.Student;
 import com.teach.javafx.request.*;
 import javafx.fxml.FXMLLoader;
@@ -52,10 +54,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * StudentController 登录交互控制类 对应 student_panel.fxml  对应于学生管理的后台业务处理的控制器，主要获取数据和保存数据的方法不同
@@ -768,7 +769,7 @@ public class StudentController extends ToolController {
 
 
 
-    public static void generateStudentPdf(List<Student> students, String filePath) throws IOException {
+    public static void generateStudentPdf(List<Student> students, List<Award> awards, String filePath) throws IOException {
         File file = new File(filePath);
         file.getParentFile().mkdirs();
 
@@ -776,11 +777,11 @@ public class StudentController extends ToolController {
              PdfDocument pdf = new PdfDocument(writer);
              Document document = new Document(pdf, PageSize.A4)) {
 
-            document.setMargins(30, 30, 30, 30);
+            document.setMargins(25, 25, 25, 25);
 
-            DeviceRgb primaryColor = new DeviceRgb(51, 103, 214);
+            DeviceRgb secondaryColor = new DeviceRgb(26, 35, 126);
             DeviceRgb textColor = new DeviceRgb(33, 33, 33);
-            DeviceRgb titleColor = new DeviceRgb(26, 35, 126);
+            DeviceRgb borderColor = new DeviceRgb(200, 200, 200);
 
             PdfFont regularFont = PdfFontFactory.createFont(
                     "STSong-Light",
@@ -788,131 +789,137 @@ public class StudentController extends ToolController {
                     PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
             );
             PdfFont boldFont = PdfFontFactory.createFont(
-                        "STSongStd-Light",
-                        "UniGB-UCS2-H",
-                        PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
-                );
-            PdfFont headerFont = boldFont;
+                    "STSongStd-Light",
+                    "UniGB-UCS2-H",
+                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
+            );
 
             for (Student student : students) {
                 Div resumeContainer = new Div()
-                        .setBorder(new SolidBorder(1))
+                        .setBorder(new SolidBorder(borderColor, 1))
                         .setPadding(20)
                         .setMarginBottom(20);
 
-                Table headerTable = new Table(new float[]{25, 75})
+                Table headerTable = new Table(new float[]{20, 80})
                         .setWidth(UnitValue.createPercentValue(100))
                         .setMarginBottom(15);
 
-                Cell photoCell = new Cell()
+                // 左侧空白占位框
+                Cell placeholderCell = new Cell()
                         .setBorder(Border.NO_BORDER)
                         .setPadding(5)
-                        .setHeight(100);
+                        .setHeight(100)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE);
 
-                Div photoPlaceholder = new Div()
+                Div placeholderDiv = new Div()
                         .setHeight(90)
                         .setWidth(80)
-                        .setBorder(new SolidBorder(0.8f));
+                        .setBorder(new SolidBorder(borderColor, 1));
 
-                photoCell.add(photoPlaceholder);
-                headerTable.addCell(photoCell);
+                placeholderCell.add(placeholderDiv);
+                headerTable.addCell(placeholderCell);
 
-                Cell infoCell = new Cell()
+                // 右侧空白单元格
+                Cell emptyCell = new Cell()
                         .setBorder(Border.NO_BORDER)
-                        .setPadding(5)
-                        .setPaddingLeft(15);
-
-                Paragraph name = new Paragraph(student.getName())
-                        .setFont(headerFont)
-                        .setFontSize(22)
-                        .setFontColor(titleColor)
-                        .setMarginBottom(8);
-                infoCell.add(name);
-
-                Paragraph basicInfo = new Paragraph()
-                        .setFont(regularFont)
-                        .setFontSize(11)
-                        .setFontColor(textColor);
-
-                basicInfo.add(new Text(student.getType() + " | "));
-                basicInfo.add(new Text("学号: " + student.getNum() + " | "));
-                basicInfo.add(new Text("专业: " + student.getMajor() + " | "));
-                basicInfo.add(new Text("班级: " + student.getClassName()));
-
-                infoCell.add(basicInfo);
-                headerTable.addCell(infoCell);
+                        .setPadding(5);
+                headerTable.addCell(emptyCell);
 
                 resumeContainer.add(headerTable);
 
-                Div personalInfoDiv = new Div()
-                        .setPadding(5)
-                        .setMarginTop(10);
-
-                personalInfoDiv.add(createSectionTitle("个人资料", boldFont, titleColor));
-
-                Table personalInfoTable = new Table(2)
+                // 个人资料部分，添加原头部信息文字内容
+                resumeContainer.add(createSectionTitle("个人资料", boldFont, secondaryColor));
+                Table personalInfoTable = new Table(1)
                         .setWidth(UnitValue.createPercentValue(100))
                         .setMarginTop(3);
 
-                personalInfoTable.addCell(createInfoCell("性别", student.getGenderName(), regularFont, textColor));
-                personalInfoTable.addCell(createInfoCell("生日", student.getBirthday(), regularFont, textColor));
+                String studentType = student.getType() != null? student.getType() : "";
+                String numInfo = "学号: " + student.getNum();
+                String majorInfo = "专业: " + student.getMajor();
+                String classNameInfo = "班级: " + student.getClassName();
 
-                personalInfoDiv.add(personalInfoTable);
-                resumeContainer.add(personalInfoDiv);
+                if (!studentType.isEmpty()) {
+                    addInfoRow(personalInfoTable, "学生类型", studentType, regularFont, textColor);
+                }
+                addInfoRow(personalInfoTable, "学号", numInfo, regularFont, textColor);
+                addInfoRow(personalInfoTable, "专业", majorInfo, regularFont, textColor);
+                addInfoRow(personalInfoTable, "班级", classNameInfo, regularFont, textColor);
+
+                addInfoRow(personalInfoTable, "性别", student.getGenderName(), regularFont, textColor);
+                addInfoRow(personalInfoTable, "生日", student.getBirthday(), regularFont, textColor);
+                addInfoRow(personalInfoTable, "身份证号", student.getCard(), regularFont, textColor);
+                resumeContainer.add(personalInfoTable);
 
                 // 联系方式部分
-                Div contactDiv = new Div()
-                        .setPadding(5)
-                        .setMarginTop(10);
-
-                contactDiv.add(createSectionTitle("联系方式", boldFont, titleColor));
-
-                Table contactTable = new Table(2)
+                resumeContainer.add(createSectionTitle("联系方式", boldFont, secondaryColor)
+                        .setMarginTop(15));
+                Table contactTable = new Table(1)
                         .setWidth(UnitValue.createPercentValue(100))
                         .setMarginTop(3);
-
-                contactTable.addCell(createInfoCell("电话", student.getPhone(), regularFont, textColor));
-                contactTable.addCell(createInfoCell("邮箱", student.getEmail(), regularFont, textColor));
-                contactTable.addCell(createInfoCell("地址", student.getAddress(), regularFont, textColor));
-
-                contactDiv.add(contactTable);
-                resumeContainer.add(contactDiv);
+                addInfoRow(contactTable, "电话", student.getPhone(), regularFont, textColor);
+                addInfoRow(contactTable, "邮箱", student.getEmail(), regularFont, textColor);
+                addInfoRow(contactTable, "地址", student.getAddress(), regularFont, textColor);
+                resumeContainer.add(contactTable);
 
                 // 教育背景部分
-                Div educationDiv = new Div()
-                        .setPadding(5)
-                        .setMarginTop(10);
-
-                educationDiv.add(createSectionTitle("教育背景", boldFont, titleColor));
-
-                Table educationTable = new Table(2)
+                resumeContainer.add(createSectionTitle("教育背景", boldFont, secondaryColor)
+                        .setMarginTop(15));
+                Table educationTable = new Table(1)
                         .setWidth(UnitValue.createPercentValue(100))
                         .setMarginTop(3);
+                addInfoRow(educationTable, "学院/部门", student.getDept(), regularFont, textColor);
+                addInfoRow(educationTable, "专业", student.getMajor(), regularFont, textColor);
+                addInfoRow(educationTable, "班级", student.getClassName(), regularFont, textColor);
+                resumeContainer.add(educationTable);
 
-                educationTable.addCell(createInfoCell("学院/部门", student.getDept(), regularFont, textColor));
-                educationTable.addCell(createInfoCell("专业", student.getMajor(), regularFont, textColor));
-                educationTable.addCell(createInfoCell("班级", student.getClassName(), regularFont, textColor));
+                // 获奖情况部分
+                resumeContainer.add(createSectionTitle("获奖情况", boldFont, secondaryColor)
+                        .setMarginTop(15));
 
-                educationDiv.add(educationTable);
-                resumeContainer.add(educationDiv);
+                if (awards != null && !awards.isEmpty()) {
+                    Table awardsTable = new Table(new float[]{40, 30, 30})
+                            .setWidth(UnitValue.createPercentValue(100))
+                            .setMarginTop(5);
 
-                Div introDiv = new Div()
-                        .setPadding(5)
-                        .setMarginTop(25);
+                    awardsTable.addHeaderCell(createTableHeaderCell("奖项名称", boldFont));
+                    awardsTable.addHeaderCell(createTableHeaderCell("奖项等级", boldFont));
+                    awardsTable.addHeaderCell(createTableHeaderCell("获奖时间", boldFont));
 
-                introDiv.add(createSectionTitle("个人简介及获奖情况", boldFont, titleColor));
-                String introduction = student.getIntroduce() != null ? student.getIntroduce() : "暂无简介";
+                    for (Award award : awards) {
+                        awardsTable.addCell(createTableCell(
+                                award.getAwardName() != null? award.getAwardName() : "未填写",
+                                regularFont));
+                        awardsTable.addCell(createTableCell(
+                                award.getAwardLevel() != null? award.getAwardLevel() : "未填写",
+                                regularFont));
+                        awardsTable.addCell(createTableCell(
+                                award.getAwardTime() != null? award.getAwardTime() : "未填写",
+                                regularFont));
+                    }
+                    resumeContainer.add(awardsTable);
+                } else {
+                    resumeContainer.add(new Paragraph("暂无获奖信息")
+                            .setFont(regularFont)
+                            .setFontSize(10)
+                            .setFontColor(textColor)
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setMarginTop(10));
+                }
+
+                // 个人简介部分
+                resumeContainer.add(createSectionTitle("个人简介", boldFont, secondaryColor)
+                        .setMarginTop(15));
+                String introduction = student.getIntroduce() != null? student.getIntroduce() : "暂无简介";
                 Paragraph introPara = new Paragraph(introduction)
                         .setFont(regularFont)
                         .setFontSize(11)
                         .setTextAlignment(TextAlignment.JUSTIFIED)
                         .setMultipliedLeading(1.5f)
-                        .setMarginTop(15);
+                        .setMarginTop(10)
+                        .setPadding(5);
 
-                introPara.setMarginBottom(170);
-                introDiv.add(introPara);
+                resumeContainer.add(introPara);
 
-                resumeContainer.add(introDiv);
                 document.add(resumeContainer);
 
                 if (students.indexOf(student) < students.size() - 1) {
@@ -920,13 +927,14 @@ public class StudentController extends ToolController {
                 }
             }
 
+            // 页脚
             Paragraph footer = new Paragraph("生成时间: " +
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .setFont(regularFont)
-                    .setFontSize(9)
-                    .setFontColor(new DeviceRgb(117, 117, 117))
+                    .setFontSize(8)
+                    .setFontColor(new DeviceRgb(150, 150, 150))
                     .setTextAlignment(TextAlignment.CENTER)
-                    .setMarginTop(3); // 减小页脚与内容的间距
+                    .setMarginTop(5);
             document.add(footer);
         }
     }
@@ -934,14 +942,14 @@ public class StudentController extends ToolController {
     private static Paragraph createSectionTitle(String title, PdfFont font, DeviceRgb color) {
         return new Paragraph(title)
                 .setFont(font)
-                .setFontSize(13)
+                .setFontSize(14)
                 .setFontColor(color)
-                .setMarginBottom(5)
+                .setMarginBottom(8)
                 .setBorderBottom(new SolidBorder(new DeviceRgb(224, 224, 224), 0.7f))
-                .setPaddingBottom(3);
+                .setPaddingBottom(5);
     }
 
-    private static Cell createInfoCell(String label, String value, PdfFont font, DeviceRgb textColor) {
+    private static void addInfoRow(Table table, String label, String value, PdfFont font, DeviceRgb textColor) {
         if (value == null || value.isEmpty()) {
             value = "暂无信息";
         }
@@ -949,61 +957,88 @@ public class StudentController extends ToolController {
         Paragraph p = new Paragraph()
                 .setFont(font)
                 .setFontSize(10)
-                .setMarginBottom(1);
+                .setMargin(2);
 
-        p.add(new Text(label + ": ").setFontColor(new DeviceRgb(97, 97, 97)));
-        p.add(new Text(value).setFontColor(textColor));
+        p.add(new Text(label + ": ").setFontColor(new DeviceRgb(97, 97, 97)).setFont(font));
+        p.add(new Text(value).setFontColor(textColor).setFont(font));
 
         Cell cell = new Cell()
                 .setBorder(Border.NO_BORDER)
-                .setPadding(2);
+                .setPadding(3)
+                .setPaddingLeft(5)
+                .add(p);
 
-        cell.add(p);
-        return cell;
+        table.addCell(cell);
     }
 
+    private static Cell createTableHeaderCell(String text, PdfFont font) {
+        return new Cell()
+                .setBackgroundColor(new DeviceRgb(240, 240, 240))
+                .setBorder(new SolidBorder(new DeviceRgb(200, 200, 200), 0.5f))
+                .setPadding(5)
+                .setTextAlignment(TextAlignment.CENTER)
+                .add(new Paragraph(text)
+                        .setFont(font)
+                        .setFontSize(10)
+                        .setBold());
+    }
 
+    private static Cell createTableCell(String text, PdfFont font) {
+        return new Cell()
+                .setBorder(new SolidBorder(new DeviceRgb(240, 240, 240), 0.5f))
+                .setPadding(5)
+                .setTextAlignment(TextAlignment.CENTER)
+                .add(new Paragraph(text)
+                        .setFont(font)
+                        .setFontSize(9));
+    }
 
     @FXML
-    public void onExportPdfButtonClick() throws IOException {
-        Map<String, Object> form = dataTableView.getSelectionModel().getSelectedItem();
-        if (form == null) {
-            MessageDialog.showDialog("没有选择，不能导出");
-            return;
-        }
-        String targetStudentNum = CommonMethod.getString(form, "num");
-        DataRequest req = new DataRequest();
-        req.add("numName", targetStudentNum);
-        DataResponse res = HttpRequestUtil.request("/api/student/getStudentList", req);
-        if (res != null && res.getCode() == 0) {
-            ArrayList<Map<String, Object>> students = (ArrayList<Map<String, Object>>) res.getData();
-            if (!students.isEmpty()) {
+    public void onExportPdfButtonClick() {
+        showExportHelpDialog();
+        try {
+            Map<String, Object> form = dataTableView.getSelectionModel().getSelectedItem();
+            if (form == null) {
+                MessageDialog.showDialog("没有选择，不能导出");
+                return;
+            }
+
+            String targetStudentNum = CommonMethod.getString(form, "num");
+            DataRequest req = new DataRequest();
+            req.add("numName", targetStudentNum);
+
+            // 获取学生信息
+            DataResponse res = HttpRequestUtil.request("/api/student/getStudentList", req);
+            // 获取获奖信息
+            DataResponse response = HttpRequestUtil.request("/api/award/getRelatedStudentForPdf", req);
+            List<Map<String, Object>> students = res != null && res.getCode() == 0
+                    ? (List<Map<String, Object>>) res.getData()
+                    : null;
+
+            List<Map<String, Object>> relatedStudentList = response != null && response.getCode() == 0
+                    ? (List<Map<String, Object>>) response.getData()
+                    : null;
+
+            if (students != null && !students.isEmpty()) {
+                // 处理学生信息
                 Map<String, Object> studentMap = students.get(0);
+                Student targetStudent = createStudentFromMap(studentMap); // 封装对象创建逻辑
 
-                Student targetStudent = new Student();
-                targetStudent.setPersonId(CommonMethod.getInteger(studentMap, "personId"));
-                targetStudent.setNum(CommonMethod.getString(studentMap, "num"));
-                targetStudent.setName(CommonMethod.getString(studentMap, "name"));
-                targetStudent.setType(CommonMethod.getString(studentMap, "type"));
-                targetStudent.setDept(CommonMethod.getString(studentMap, "dept"));
-                targetStudent.setCard(CommonMethod.getString(studentMap, "card"));
-                targetStudent.setGender(CommonMethod.getString(studentMap, "gender"));
-                targetStudent.setGenderName(CommonMethod.getString(studentMap, "genderName"));
-                targetStudent.setBirthday(CommonMethod.getString(studentMap, "birthday"));
-                targetStudent.setEmail(CommonMethod.getString(studentMap, "email"));
-                targetStudent.setPhone(CommonMethod.getString(studentMap, "phone"));
-                targetStudent.setAddress(CommonMethod.getString(studentMap, "address"));
-                targetStudent.setIntroduce(CommonMethod.getString(studentMap, "introduce"));
-                targetStudent.setMajor(CommonMethod.getString(studentMap, "major"));
-                targetStudent.setClassName(CommonMethod.getString(studentMap, "className"));
+                // 处理获奖信息
+                List<Award> relatedAwards = new ArrayList<>();
+                if (relatedStudentList != null) {
+                    for (Map<String, Object> awardMap : relatedStudentList) {
+                        relatedAwards.add(createAwardFromMap(awardMap)); // 封装奖项创建逻辑
+                    }
+                }
 
-                List<Student> studentList = new ArrayList<>();
-                studentList.add(targetStudent);
-
+                // 打开文件选择对话框
                 FileChooser fileDialog = new FileChooser();
                 fileDialog.setTitle("请选择导出文件路径");
                 fileDialog.setInitialDirectory(new File("D:/"));
-                fileDialog.getExtensionFilters().addAll();
+                fileDialog.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("PDF文件", "*.pdf")
+                );
 
                 File selectedFile = fileDialog.showSaveDialog(null);
                 if (selectedFile != null) {
@@ -1011,18 +1046,68 @@ public class StudentController extends ToolController {
                     if (!filePath.toLowerCase().endsWith(".pdf")) {
                         filePath += ".pdf";
                     }
-                    generateStudentPdf(studentList, filePath);
+
+                    // 生成PDF
+                    generateStudentPdf(Collections.singletonList(targetStudent), relatedAwards, filePath);
                     MessageDialog.showDialog("导出成功！");
                 }
             } else {
-                MessageDialog.showDialog("未找到对应的学生信息");
+                MessageDialog.showDialog(res != null ? res.getMsg() : "未找到对应的学生信息");
             }
-        } else {
-            if (res != null) {
-                MessageDialog.showDialog(res.getMsg());
-            } else {
-                MessageDialog.showDialog("获取学生信息失败");
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            MessageDialog.showDialog("导出失败：" + e.getMessage());
         }
+    }
+
+    // 新增帮助对话框方法
+    private void showExportHelpDialog() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("导出PDF帮助");
+        alert.setHeaderText("如何导出学生信息PDF");
+        alert.setContentText(
+                "1. 在弹出的文件保存对话框中，选择要保存PDF的文件夹\n" +
+                        "2. 在\"文件名\"字段中输入PDF文件的名称（例如：学生信息.pdf）\n" +
+                        "3. 确认文件路径和名称无误后，点击\"保存\"按钮\n\n" +
+
+                        "注意事项：\n" +
+                        "- 请确保有写入该文件夹的权限\n" +
+                        "- 文件名不要包含特殊字符（如 / \\ : * ? \" < > | ）\n" +
+                        "- 如果文件已存在，将会被覆盖"
+        );
+
+        // 自定义对话框样式（可选）
+        alert.getDialogPane().setStyle("-fx-font-size: 13px;");
+        alert.showAndWait();
+    }
+
+    // 封装学生对象创建逻辑
+    private Student createStudentFromMap(Map<String, Object> studentMap) {
+        Student student = new Student();
+        student.setPersonId(CommonMethod.getInteger(studentMap, "personId"));
+        student.setNum(CommonMethod.getString(studentMap, "num"));
+        student.setName(CommonMethod.getString(studentMap, "name"));
+        student.setType(CommonMethod.getString(studentMap, "type"));
+        student.setDept(CommonMethod.getString(studentMap, "dept"));
+        student.setCard(CommonMethod.getString(studentMap, "card"));
+        student.setGender(CommonMethod.getString(studentMap, "gender"));
+        student.setGenderName(CommonMethod.getString(studentMap, "genderName"));
+        student.setBirthday(CommonMethod.getString(studentMap, "birthday"));
+        student.setEmail(CommonMethod.getString(studentMap, "email"));
+        student.setPhone(CommonMethod.getString(studentMap, "phone"));
+        student.setAddress(CommonMethod.getString(studentMap, "address"));
+        student.setIntroduce(CommonMethod.getString(studentMap, "introduce"));
+        student.setMajor(CommonMethod.getString(studentMap, "major"));
+        student.setClassName(CommonMethod.getString(studentMap, "className"));
+        return student;
+    }
+
+    // 封装奖项对象创建逻辑
+    private Award createAwardFromMap(Map<String, Object> awardMap) {
+        Award award = new Award();
+        award.setAwardName(CommonMethod.getString(awardMap, "awardName"));
+        award.setAwardLevel(CommonMethod.getString(awardMap, "awardLevel"));
+        award.setAwardTime(CommonMethod.getString(awardMap, "awardTime"));
+        return award;
     }
 }
