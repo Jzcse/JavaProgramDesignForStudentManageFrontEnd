@@ -11,12 +11,12 @@
 <?import javafx.scene.text.Font?>
 <!-- 前端应用主框架FXML配置文件 对应页面交互控制类 com.teach.javafx.controller.base.MainFrameController -->
 <?import javafx.scene.control.TreeView?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.base.MainFrameController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.base.MainFrameController" stylesheets="@../css/main-frame.css">
   <top>
     <MenuBar fx:id="menuBar" />
   </top>
   <left>
-    <TreeView fx:id="menuTree" prefWidth="200"/>
+    <TreeView fx:id="menuTree" prefWidth= "200"/> <!--  -->
   </left>
   <center>
     <TabPane fx:id="contentTabPane"  tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">

@@ -1,0 +1,16 @@
+.label-title {
+    -fx-font-size: 20;
+    -fx-font-color: white;
+}
+
+#sum {
+    -fx-font-size: 50;
+}
+
+#sum_box {
+    -fx-background-color: blue;
+}
+
+.table {
+    -fx-alignment: center;
+}

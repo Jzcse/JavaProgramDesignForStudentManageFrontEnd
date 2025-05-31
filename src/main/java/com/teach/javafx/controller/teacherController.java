@@ -14,22 +14,26 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-import java.io.File;
-import java.io.IOException;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 public class teacherController extends ToolController {
     //IMPORT FXML ID
@@ -38,25 +42,25 @@ public class teacherController extends ToolController {
     @FXML
     private TableColumn<Map<String, String>, String> numColumn;     //教师学工号
     @FXML
-    private  TableColumn<Map<String, String>, String> nameColumn;   //教师姓名
+    private TableColumn<Map<String, String>, String> nameColumn;   //教师姓名
     @FXML
-    private  TableColumn<Map<String, String>, String> deptColumn;   //教师学院
+    private TableColumn<Map<String, String>, String> deptColumn;   //教师学院
     @FXML
-    private  TableColumn<Map<String, String>, String> majorColumn;  //教师专业
+    private TableColumn<Map<String, String>, String> majorColumn;  //教师专业
     @FXML
-    private  TableColumn<Map<String, String>, String> titleColumn;  //教师职称
+    private TableColumn<Map<String, String>, String> titleColumn;  //教师职称
     @FXML
-    private  TableColumn<Map<String, String>, String> cardColumn;   //教师证件号
+    private TableColumn<Map<String, String>, String> cardColumn;   //教师证件号
     @FXML
-    private  TableColumn<Map<String, String>, String> genderColumn; //教师性别
+    private TableColumn<Map<String, String>, String> genderColumn; //教师性别
     @FXML
-    private  TableColumn<Map<String, String>, String> birthdayColumn;//教师生日
+    private TableColumn<Map<String, String>, String> birthdayColumn;//教师生日
     @FXML
-    private  TableColumn<Map<String, String>, String> emailColumn;  //教师电子邮件
+    private TableColumn<Map<String, String>, String> emailColumn;  //教师电子邮件
     @FXML
-    private  TableColumn<Map<String, String>, String> phoneColumn;  //教师电话
+    private TableColumn<Map<String, String>, String> phoneColumn;  //教师电话
     @FXML
-    private  TableColumn<Map<String, String>, String> addressColumn;//教师地址
+    private TableColumn<Map<String, String>, String> addressColumn;//教师地址
     //components of right box for detail info of teacher
     @FXML
     private ImageView photoImage;
@@ -100,8 +104,8 @@ public class teacherController extends ToolController {
     private Button editButton;
     @FXML
     private Button importFeeButton;
-
-
+    @FXML
+    private Button exportPdfButton; // 新增：导出PDF按钮
 
     //service
     private boolean isNew = false;
@@ -113,12 +117,12 @@ public class teacherController extends ToolController {
     private List<OptionItem> genderList;
     private String baseUrl;
 
-    private void setVBoxVisible(boolean isVisible){
+    private void setVBoxVisible(boolean isVisible) {
         vBoxPanel.setVisible(isVisible);
         vBoxPanel.setManaged(isVisible);
     }
 
-    private void setEditAble(boolean isEditAble){
+    private void setEditAble(boolean isEditAble) {
         numField.setEditable(isEditAble);
         nameField.setEditable(isEditAble);
         deptField.setEditable(isEditAble);
@@ -133,19 +137,19 @@ public class teacherController extends ToolController {
         birthdayPick.setDisable(!isEditAble);
     }
 
-    public void refreshTeacherList(){
+    public void refreshTeacherList() {
         int currentPage = (int) pagination.getCurrentPageIndex();
         DataRequest dataRequest = new DataRequest();
         dataRequest.add("page", currentPage);
         dataRequest.add("size", 33);
         DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/getTeacherList", dataRequest);
-        if (dataResponse != null && dataResponse.getCode() == 0){
+        if (dataResponse != null && dataResponse.getCode() == 0) {
             teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
             setTableViewData();
         }
     }
 
-    public void setTableViewData(){
+    public void setTableViewData() {
         observableList.clear();
         for (Map<String, String> stringStringMap : teacherList) {
             observableList.addAll(FXCollections.observableArrayList(stringStringMap));
@@ -153,13 +157,13 @@ public class teacherController extends ToolController {
         dataTableView.setItems(observableList);
     }
 
-    public void refreshPageCount(){
+    public void refreshPageCount() {
         DataRequest dataRequestForTeacherCount = new DataRequest();
         DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/getTeacherCount", dataRequestForTeacherCount);
-        if (dataResponse != null && dataResponse.getCode() == 0){
+        if (dataResponse != null && dataResponse.getCode() == 0) {
             Map<String, String> map = (Map<String, String>) dataResponse.getData();
             teacherCount = Integer.parseInt(CommonMethod.getString(map, "count"));
-            if (teacherCount % 33 == 0){
+            if (teacherCount % 33 == 0) {
                 pageCount = teacherCount / 33;
             } else {
                 pageCount = teacherCount / 33 + 1;
@@ -176,7 +180,7 @@ public class teacherController extends ToolController {
         dataRequest.add("page", 0);
         dataRequest.add("size", 33);
         DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/getTeacherList", dataRequest);
-        if (dataResponse != null && dataResponse.getCode() == 0){
+        if (dataResponse != null && dataResponse.getCode() == 0) {
             teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
         }
         numColumn.setCellValueFactory(new MapValueFactory("num"));  //设置列值工程属性
@@ -235,6 +239,10 @@ public class teacherController extends ToolController {
         //设置右侧的面板初始为隐藏状态
         setVBoxVisible(false);
         setEditAble(false);
+
+        // 新增：初始化导出PDF按钮
+        exportPdfButton.setText("导出 PDF 简历");
+        exportPdfButton.setOnAction(event -> exportTeacherResume());
     }
 
     public void onTableRowSelect(ListChangeListener.Change<? extends Integer> change) {
@@ -249,12 +257,14 @@ public class teacherController extends ToolController {
         importFeeButton.setManaged(true);
         editButton.setManaged(true);
         editButton.setVisible(true);
+        exportPdfButton.setManaged(true);
+        exportPdfButton.setVisible(true); // 新增：选中教师时显示导出按钮
         changeTeacherInfo();
         displayPhoto();
     }
 
     public void displayPhoto() {
-        if (personId == null){
+        if (personId == null) {
             MessageDialog.showDialog("未选择教师");
             return;
         }
@@ -262,7 +272,7 @@ public class teacherController extends ToolController {
             // 获取当前文件的路径并设置图片文件保存位置
             File saveDir;
             String classPath = System.getProperty("java.class.path");
-            if(classPath.endsWith(".jar")){
+            if (classPath.endsWith(".jar")) {
                 // 生产环境
                 java.net.URI uri = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
                 java.io.File jarFile = new java.io.File(uri);
@@ -274,8 +284,8 @@ public class teacherController extends ToolController {
             // 新建保存图片的文件夹
             String newDir = "photos";
             File newDirFile = new File(saveDir, newDir);
-            if(!newDirFile.exists()){
-                if(newDirFile.mkdirs()){
+            if (!newDirFile.exists()) {
+                if (newDirFile.mkdirs()) {
                     System.out.println("新目录创建成功" + newDirFile.getAbsolutePath());
                 } else {
                     MessageDialog.showDialog("无法在当前文件夹创建新目录用以下载并保存用户的图片，请检查权限！");
@@ -285,10 +295,10 @@ public class teacherController extends ToolController {
             DataRequest dataRequest = new DataRequest();
             dataRequest.add("personId", personId);
             DataResponse dataResponse = HttpRequestUtil.request("/api/photo/download", dataRequest);
-            if (dataResponse != null){
-                if (dataResponse.getCode() == 0){
+            if (dataResponse != null) {
+                if (dataResponse.getCode() == 0) {
                     System.out.println("下载成功");
-                    try{
+                    try {
                         Map<String, String> dataMap = (Map<String, String>) dataResponse.getData();
                         String data = CommonMethod.getString(dataMap, "file");
                         byte[] fileBytes = java.util.Base64.getDecoder().decode(data);
@@ -300,7 +310,7 @@ public class teacherController extends ToolController {
 
                         String url = saveFile.toURI().toString();
                         Image image = new Image(url);
-                        if (image.isError()){
+                        if (image.isError()) {
                             System.out.println("图片加载失败");
                         } else {
                             System.out.println("图片加载成功");
@@ -309,7 +319,7 @@ public class teacherController extends ToolController {
                     } catch (IOException e) {
                         MessageDialog.showDialog("照片下载失败，请检查：\n1. 文件权限；\n2. 磁盘空间；\n3. 写入文件夹是否正在被其他程序占用。");
                         throw new RuntimeException(e);
-                    } catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println("无效的本地路径");
                         Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
                         photoImage.setImage(image);
@@ -327,10 +337,9 @@ public class teacherController extends ToolController {
             MessageDialog.showDialog("无法解析当前文件路径！");
             throw new RuntimeException(e);
         }
-
     }
 
-    public void changeTeacherInfo(){
+    public void changeTeacherInfo() {
         Map<String, String> form = dataTableView.getSelectionModel().getSelectedItem();
         if (form == null) {
             clearPanel();
@@ -371,11 +380,13 @@ public class teacherController extends ToolController {
         importFeeButton.setManaged(false);
         editButton.setManaged(false);
         editButton.setVisible(false);
+        exportPdfButton.setManaged(false);
+        exportPdfButton.setVisible(false); // 新增：新增教师时隐藏导出按钮
         clearPanel();
     }
 
     //  清空输入信息
-    public void clearPanel(){
+    public void clearPanel() {
         personId = null;
         numField.setText("");
         nameField.setText("");
@@ -388,6 +399,9 @@ public class teacherController extends ToolController {
         emailField.setText("");
         phoneField.setText("");
         addressField.setText("");
+        // 清空照片
+        Image image = new Image("https://ts4.tc.mm.bing.net/th/id/OIP-C.rA8p_zRRqpN4GlcYol5p4AAAAA?rs=1&pid=ImgDetMain");
+        photoImage.setImage(image);
     }
 
     public void onDeleteButtonClick(ActionEvent actionEvent) {
@@ -396,18 +410,22 @@ public class teacherController extends ToolController {
             MessageDialog.showDialog("请选定要删除的教师");
         } else {
             int choice = MessageDialog.choiceDialog("确定要删除吗？");
-            if (choice == MessageDialog.CHOICE_YES){
+            if (choice == MessageDialog.CHOICE_YES) {
                 personId = CommonMethod.getInteger(from, "personId");
                 DataRequest dataRequest = new DataRequest();
                 dataRequest.add("personId", personId);
                 DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/deleteTeacher", dataRequest);
-                if (dataResponse != null){
-                    if (dataResponse.getCode() == 0){
+                if (dataResponse != null) {
+                    if (dataResponse.getCode() == 0) {
                         MessageDialog.showDialog("删除成功！");
                         //刷新教师数量及页码数
                         refreshPageCount();
                         //刷新表格
                         refreshTeacherList();
+                        // 隐藏右侧面板
+                        setVBoxVisible(false);
+                        exportPdfButton.setManaged(false);
+                        exportPdfButton.setVisible(false); // 新增：删除教师后隐藏导出按钮
                     } else {
                         MessageDialog.showDialog(dataResponse.getMsg());
                     }
@@ -422,12 +440,12 @@ public class teacherController extends ToolController {
     public void onQueryButtonClick(ActionEvent actionEvent) {
         String input = numNameTextField.getText();
         DataRequest dataRequest = new DataRequest();
-        if (input.matches(".*\\d.*")){
+        if (input.matches(".*\\d.*")) {
             //num query
             dataRequest.add("num", input);
             DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/searchTeacherByNum", dataRequest);
             if (dataResponse != null) {
-                if (dataResponse.getCode() == 0){
+                if (dataResponse.getCode() == 0) {
                     teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
                     setTableViewData();
                 } else {
@@ -440,8 +458,8 @@ public class teacherController extends ToolController {
             dataRequest.add("name", input);
             DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/searchTeacherByName", dataRequest);
 
-            if (dataResponse != null){
-                if (dataResponse.getCode() == 0){
+            if (dataResponse != null) {
+                if (dataResponse.getCode() == 0) {
                     //刷新表格
                     teacherList = (ArrayList<Map<String, String>>) dataResponse.getData();
                     setTableViewData();
@@ -460,9 +478,9 @@ public class teacherController extends ToolController {
                 new FileChooser.ExtensionFilter("图片文件", "*.png", "*.jpg", "*.jpeg")
         );
         File file = chooser.showOpenDialog(null);
-        if(file != null) {
+        if (file != null) {
             DataResponse dataResponse = HttpRequestUtil.newUploadFile("/api/photo/upload", file, "file", personId.toString());
-            if (dataResponse.getCode() == 0){
+            if (dataResponse.getCode() == 0) {
                 MessageDialog.showDialog("上传成功");
                 displayPhoto();
             }
@@ -473,12 +491,12 @@ public class teacherController extends ToolController {
     }
 
     public void onSaveButtonClick(ActionEvent actionEvent) {
-        if (isNew){
-            if (numField.getText().isEmpty()){
+        if (isNew) {
+            if (numField.getText().isEmpty()) {
                 MessageDialog.showDialog("工号为空，不能添加教师！");
                 return;
             }
-            if (nameField.getText().isEmpty()){
+            if (nameField.getText().isEmpty()) {
                 MessageDialog.showDialog("姓名不能为空");
                 return;
             }
@@ -493,7 +511,7 @@ public class teacherController extends ToolController {
             if (genderComboBox.getSelectionModel() != null && genderComboBox.getSelectionModel().getSelectedItem() != null)
                 personForm.put("gender", genderComboBox.getSelectionModel().getSelectedItem().getValue());
             String birthdayTemp = birthdayPick.getEditor().getText();
-            if (!birthdayTemp.matches("^(?:(?:19|20)\\d{2})-(?:(?:0[1-9]|1[0-2]))-(?:(?:0[1-9]|[12]\\d|3[01]))$")){
+            if (!birthdayTemp.matches("^(?:(?:19|20)\\d{2})-(?:(?:0[1-9]|1[0-2]))-(?:(?:0[1-9]|[12]\\d|3[01]))$")) {
                 MessageDialog.showDialog("日期不符合规范,请检查。");
                 return;
             } else {
@@ -506,7 +524,7 @@ public class teacherController extends ToolController {
             dataRequest.add("teacherMap", teacherForm);
             dataRequest.add("personMap", personForm);
             DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/addTeacher", dataRequest);
-            if (dataResponse.getCode() == 0){
+            if (dataResponse.getCode() == 0) {
                 MessageDialog.showDialog("添加教师成功");
                 //刷新教师数与页数
                 refreshPageCount();
@@ -516,6 +534,10 @@ public class teacherController extends ToolController {
                 refreshTeacherList();
                 //clear
                 clearPanel();
+                // 隐藏右侧面板
+                setVBoxVisible(false);
+                exportPdfButton.setManaged(false);
+                exportPdfButton.setVisible(false); // 新增：添加教师后隐藏导出按钮
             } else {
                 MessageDialog.showDialog(dataResponse.getMsg());
             }
@@ -538,7 +560,7 @@ public class teacherController extends ToolController {
             if (genderComboBox.getSelectionModel() != null && genderComboBox.getSelectionModel().getSelectedItem() != null)
                 form.put("gender", genderComboBox.getSelectionModel().getSelectedItem().getValue());
             String birthdayTemp = birthdayPick.getEditor().getText();
-            if (!birthdayTemp.matches("^(?:(?:19|20)\\d{2})-(?:(?:0[1-9]|1[0-2]))-(?:(?:0[1-9]|[12]\\d|3[01]))$")){
+            if (!birthdayTemp.matches("^(?:(?:19|20)\\d{2})-(?:(?:0[1-9]|1[0-2]))-(?:(?:0[1-9]|[12]\\d|3[01]))$")) {
                 MessageDialog.showDialog("日期不符合规范,请检查。");
                 return;
             } else {
@@ -550,10 +572,12 @@ public class teacherController extends ToolController {
             dataRequest.add("form", form);
             //response
             DataResponse dataResponse = HttpRequestUtil.request("/api/teacher/editTeacherInfo", dataRequest);
-            if (dataResponse != null && dataResponse.getCode() == 0){
+            if (dataResponse != null && dataResponse.getCode() == 0) {
                 MessageDialog.showDialog("更改成功！");
                 //刷新表格
                 refreshTeacherList();
+            } else {
+                MessageDialog.showDialog(dataResponse.getMsg());
             }
         }
     }
@@ -576,5 +600,264 @@ public class teacherController extends ToolController {
         importFeeButton.setManaged(false);
         editButton.setManaged(false);
         editButton.setVisible(false);
+    }
+
+    @FXML
+    private void exportTeacherResume() {
+        Map<String, String> selectedTeacher = dataTableView.getSelectionModel().getSelectedItem();
+        if (selectedTeacher == null) {
+            MessageDialog.showDialog("请先选择一位教师");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("保存教师简历");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF 文件", "*.pdf"));
+        fileChooser.setInitialFileName(selectedTeacher.get("name") + "_简历.pdf");
+        File file = fileChooser.showSaveDialog(dataTableView.getScene().getWindow());
+
+        if (file != null) {
+            try (PDDocument document = new PDDocument()) {
+                PDPage page = new PDPage(PDRectangle.A4);
+                document.addPage(page);
+
+                // 加载字体
+                PDType0Font simsunFont;
+                PDType0Font simsunBoldFont;
+
+                try (InputStream fontStream1 = getClass().getResourceAsStream("/fonts/simsun.ttf")) {
+                    if (fontStream1 == null) {
+                        throw new IOException("SimSun字体文件未找到，请确保/fonts/simsun.ttf存在");
+                    }
+                    simsunFont = PDType0Font.load(document, fontStream1);
+                }
+
+                try (InputStream fontStream2 = getClass().getResourceAsStream("/fonts/simsun.ttf")) {
+                    if (fontStream2 == null) {
+                        throw new IOException("SimSun字体文件未找到，请确保/fonts/simsun.ttf存在");
+                    }
+                    simsunBoldFont = PDType0Font.load(document, fontStream2);
+                }
+
+                try (PDPageContentStream contentStream = new PDPageContentStream(document, page,
+                        PDPageContentStream.AppendMode.APPEND, true)) {
+
+                    // 设置整个页面的底色
+                    drawPageBackground(contentStream);
+
+                    // 设置页面边框和内部内容区背景
+                    drawPageBorderAndContentBackground(contentStream);
+
+                    // 页面边距和初始位置
+                    float margin = 40;
+                    float startX = margin;
+                    float yPosition = PDRectangle.A4.getHeight() - margin;
+
+                    // 1. 标题和照片区
+                    drawPhotoAndTitleSection(contentStream, selectedTeacher, startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 130;
+
+                    // 分隔线
+                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
+                    yPosition -= 20;
+
+                    // 2. 个人资料区
+                    drawSectionTitle(contentStream, "个人资料", startX, yPosition, simsunBoldFont);
+                    yPosition -= 25;
+                    drawKeyValue(contentStream, "编号:", selectedTeacher.get("num"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 20;
+                    drawKeyValue(contentStream, "姓名:", selectedTeacher.get("name"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 20;
+                    drawKeyValue(contentStream, "性别:", getGenderDisplay(selectedTeacher.get("gender")), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 20;
+                    drawKeyValue(contentStream, "学院:", selectedTeacher.get("dept"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 20;
+                    drawKeyValue(contentStream, "职称:", selectedTeacher.get("title"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 30;
+
+                    // 分隔线
+                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
+                    yPosition -= 20;
+
+                    // 3. 联系方式区
+                    drawSectionTitle(contentStream, "联系方式", startX, yPosition, simsunBoldFont);
+                    yPosition -= 25;
+                    drawKeyValue(contentStream, "邮箱:", selectedTeacher.get("email"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 20;
+                    drawKeyValue(contentStream, "电话:", selectedTeacher.get("phone"), startX, yPosition, simsunBoldFont, simsunFont);
+                    yPosition -= 30;
+
+                    // 分隔线
+                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
+                    yPosition -= 20;
+
+                    // 4. 个人履历区（留白）
+                    drawSectionTitle(contentStream, "个人履历", startX, yPosition, simsunBoldFont);
+                    yPosition -= 25;
+                    contentStream.setFont(simsunFont, 12);
+                    contentStream.setNonStrokingColor(0.5f, 0.5f, 0.5f);
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(startX, yPosition);
+                    contentStream.showText("（请在此处填写个人履历信息）");
+                    contentStream.endText();
+
+                    // 页脚
+                    drawFooter(contentStream, margin, simsunFont);
+                }
+
+                document.save(file);
+                MessageDialog.showDialog("PDF 简历导出成功！");
+            } catch (IOException e) {
+                e.printStackTrace();
+                MessageDialog.showDialog("导出失败：" + e.getMessage());
+            }
+        }
+    }
+
+    private void drawPageBackground(PDPageContentStream contentStream) throws IOException {
+        // 整个页面的底色（比内部区域稍浅）
+        contentStream.setNonStrokingColor(0.95f, 0.97f, 1.0f); // 非常浅的蓝色
+        contentStream.addRect(0, 0, PDRectangle.A4.getWidth(), PDRectangle.A4.getHeight());
+        contentStream.fill();
+    }
+
+    private void drawPageBorderAndContentBackground(PDPageContentStream contentStream) throws IOException {
+        // 内部内容区的边距和尺寸
+        float margin = 30;
+        float width = PDRectangle.A4.getWidth() - 2 * margin;
+        float height = PDRectangle.A4.getHeight() - 2 * margin;
+
+        // 绘制内部内容区背景（浅蓝色）
+        contentStream.setNonStrokingColor(0.9f, 0.95f, 1.0f); // 浅蓝色
+        contentStream.addRect(margin, margin, width, height);
+        contentStream.fill();
+
+        // 绘制边框
+        contentStream.setStrokingColor(0.6f, 0.6f, 0.6f);
+        contentStream.setLineWidth(1.5f);
+        contentStream.addRect(margin, margin, width, height);
+        contentStream.stroke();
+    }
+
+    private void drawPhotoAndTitleSection(PDPageContentStream contentStream, Map<String, String> teacher,
+                                          float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
+        // 照片占位框
+        float photoSize = 90;
+        float photoX = x + 10;
+        float photoY = y - photoSize - 10;
+
+        // 绘制照片框
+        contentStream.setStrokingColor(0.4f, 0.4f, 0.4f);
+        contentStream.setLineWidth(1);
+        contentStream.addRect(photoX, photoY, photoSize, photoSize);
+        contentStream.stroke();
+
+        // 照片框内文字提示
+        contentStream.setFont(regularFont, 10);
+        contentStream.setNonStrokingColor(0.6f, 0.6f, 0.6f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(photoX + photoSize/2 - 25, photoY + photoSize/2);
+        contentStream.showText("照片区域");
+        contentStream.endText();
+
+        // 右侧标题和信息
+        float textX = photoX + photoSize + 20;
+        float textY = y - 20;
+
+        // 姓名（大字）
+        contentStream.setFont(boldFont, 24);
+        contentStream.setNonStrokingColor(0, 0, 0);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textX, textY);
+        contentStream.showText(teacher.get("name"));
+        contentStream.endText();
+
+        // 编号、学院、职称（小字）
+        contentStream.setFont(regularFont, 12);
+        contentStream.setNonStrokingColor(0.4f, 0.4f, 0.4f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textX, textY - 30);
+        contentStream.showText("编号: " + teacher.get("num"));
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textX, textY - 50);
+        contentStream.showText("学院: " + teacher.get("dept"));
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textX, textY - 70);
+        contentStream.showText("职称: " + teacher.get("title"));
+        contentStream.endText();
+    }
+
+    private void drawTitle(PDPageContentStream contentStream, Map<String, String> teacher,
+                           float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
+        contentStream.setFont(boldFont, 20);
+        contentStream.setNonStrokingColor(0, 0, 0);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x, y);
+        contentStream.showText(teacher.get("name") + " 教师简历");
+        contentStream.endText();
+
+        contentStream.setFont(regularFont, 12);
+        contentStream.setNonStrokingColor(0.4f, 0.4f, 0.4f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x, y - 20);
+        contentStream.showText("工号: " + teacher.get("num") + " | 职称: " + teacher.get("title"));
+        contentStream.endText();
+    }
+
+    private void drawSectionTitle(PDPageContentStream contentStream, String title,
+                                  float x, float y, PDType0Font boldFont) throws IOException {
+        contentStream.setFont(boldFont, 14);
+        contentStream.setNonStrokingColor(0.2f, 0.2f, 0.6f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x, y);
+        contentStream.showText(title);
+        contentStream.endText();
+    }
+
+    private void drawKeyValue(PDPageContentStream contentStream, String key, String value,
+                              float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
+        // 绘制键（粗体）
+        contentStream.setFont(boldFont, 12);
+        contentStream.setNonStrokingColor(0.3f, 0.3f, 0.3f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x, y);
+        contentStream.showText(key);
+        contentStream.endText();
+
+        // 绘制值（常规字体）
+        contentStream.setFont(regularFont, 12);
+        contentStream.setNonStrokingColor(0.1f, 0.1f, 0.1f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x + 60, y);
+        contentStream.showText(value != null ? value : "未填写");
+        contentStream.endText();
+    }
+
+    private void drawFooter(PDPageContentStream contentStream, float margin, PDType0Font font) throws IOException {
+        String footerText = "简历生成时间: " + LocalDate.now().toString();
+        float textWidth = font.getStringWidth(footerText) / 1000 * 10;
+
+        contentStream.setFont(font, 10);
+        contentStream.setNonStrokingColor(0.5f, 0.5f, 0.5f);
+        contentStream.beginText();
+        contentStream.newLineAtOffset((PDRectangle.A4.getWidth() - textWidth) / 2, margin - 15);
+        contentStream.showText(footerText);
+        contentStream.endText();
+    }
+
+    private void drawDivider(PDPageContentStream contentStream, float x, float y, float width) throws IOException {
+        contentStream.setStrokingColor(0.8f, 0.8f, 0.8f);
+        contentStream.setLineWidth(1);
+        contentStream.moveTo(x, y);
+        contentStream.lineTo(x + width, y);
+        contentStream.stroke();
+    }
+
+    private String getGenderDisplay(String genderCode) {
+        return "1".equals(genderCode) ? "男" : "女";
     }
 }

@@ -1,0 +1,18 @@
+.tree-view {
+    -fx-background-color: #f8f9fa;
+    -fx-border-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2); /* 添加轻微阴影 */
+}
+.tree-cell:selected {
+    -fx-background-color: #42a5f5;
+    -fx-text-fill: white;
+}
+.tree-cell:filled:hover {
+    -fx-text-fill: #0d6efd;
+    -fx-background-color: #e9ecef;
+    -fx-cursor: hand;
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
+    -fx-transition: all 0.2s ease; /* 添加过渡动画 */
+}
+
