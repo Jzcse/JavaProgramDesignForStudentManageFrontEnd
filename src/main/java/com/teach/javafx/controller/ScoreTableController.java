@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,19 @@ public class ScoreTableController {
     private TableColumn<Map,String> markColumn;
     @FXML
     private TableColumn<Map, Button> editColumn;
+
+    @FXML
+    private TableColumn<Map,String> PerformanceMarkColumn;
+    @FXML
+    private TableColumn<Map,String> MidTermMarkColumn;
+    @FXML
+    private TableColumn<Map,String> FinalTermMarkColumn;
+    @FXML
+    private TableColumn<Map,String> PerformanceWeightColumn;
+    @FXML
+    private TableColumn<Map,String> MidTermWeightColumn;
+    @FXML
+    private TableColumn<Map,String> FinalTermWeightColumn;
 
 
     private ArrayList<Map> scoreList = new ArrayList();  // 学生信息列表数据
@@ -69,18 +83,18 @@ public class ScoreTableController {
 
     @FXML
     private void onQueryButtonClick(){
-        Integer personId = 0;
+        Integer studentId = 0;
         Integer courseId = 0;
         OptionItem op;
         op = studentComboBox.getSelectionModel().getSelectedItem();
         if(op != null)
-            personId = Integer.parseInt(op.getValue());
+            studentId = Integer.parseInt(op.getValue());
         op = courseComboBox.getSelectionModel().getSelectedItem();
         if(op != null)
             courseId = Integer.parseInt(op.getValue());
         DataResponse res;
         DataRequest req =new DataRequest();
-        req.add("personId",personId);
+        req.add("studentId", studentId);
         req.add("courseId",courseId);
         res = HttpRequestUtil.request("/api/score/getScoreList",req); //从后台获取所有学生信息列表集合
         if(res != null && res.getCode()== 0) {
@@ -129,6 +143,13 @@ public class ScoreTableController {
         markColumn.setCellValueFactory(new MapValueFactory<>("mark"));
         editColumn.setCellValueFactory(new MapValueFactory<>("edit"));
 
+        PerformanceMarkColumn.setCellValueFactory(new MapValueFactory<>("PerformanceMark"));
+        MidTermMarkColumn.setCellValueFactory(new MapValueFactory<>("MidTermMark"));
+        FinalTermMarkColumn.setCellValueFactory(new MapValueFactory<>("FinalTermMark"));
+        PerformanceWeightColumn.setCellValueFactory(new MapValueFactory<>("PerformanceWeight"));
+        MidTermWeightColumn.setCellValueFactory(new MapValueFactory<>("MidTermWeight"));
+        FinalTermWeightColumn.setCellValueFactory(new MapValueFactory<>("FinalTermWeight"));
+
         DataRequest req =new DataRequest();
         studentList = HttpRequestUtil.requestOptionItemList("/api/score/getStudentItemOptionList",req); //从后台获取所有学生信息列表集合
         courseList = HttpRequestUtil.requestOptionItemList("/api/score/getCourseItemOptionList",req); //从后台获取所有学生信息列表集合
@@ -148,7 +169,7 @@ public class ScoreTableController {
         Scene scene = null;
         try {
             fxmlLoader = new FXMLLoader(MainApplication.class.getResource("score-edit-dialog.fxml"));
-            scene = new Scene(fxmlLoader.load(), 260, 140);
+            scene = new Scene(fxmlLoader.load(), 400, 400);
             stage = new Stage();
             stage.initOwner(MainApplication.getMainStage());
             stage.initModality(Modality.NONE);
@@ -187,8 +208,15 @@ public class ScoreTableController {
         req.add("courseId",courseId);
         req.add("scoreId",CommonMethod.getInteger(data,"scoreId"));
         req.add("mark",CommonMethod.getInteger(data,"mark"));
+        req.add("PerformanceWeight",CommonMethod.getInteger(data,"PerformanceWeight"));
+        req.add("MidTermWeight",CommonMethod.getInteger(data,"MidTermWeight"));
+        req.add("FinalTermWeight",CommonMethod.getInteger(data,"FinalTermWeight"));
+        req.add("PerformanceMark",CommonMethod.getInteger(data,"PerformanceMark"));
+        req.add("MidTermMark",CommonMethod.getInteger(data,"MidTermMark"));
+        req.add("FinalTermMark",CommonMethod.getInteger(data,"FinalTermMark"));
         res = HttpRequestUtil.request("/api/score/scoreSave",req); //从后台获取所有学生信息列表集合
         if(res != null && res.getCode()== 0) {
+            MessageDialog.showDialog("保存成功");
             onQueryButtonClick();
         }
     }
@@ -198,6 +226,7 @@ public class ScoreTableController {
         scoreEditController.showDialog(null);
         MainApplication.setCanClose(false);
         stage.showAndWait();
+        onQueryButtonClick();
     }
     @FXML
     private void onEditButtonClick() {
@@ -234,5 +263,6 @@ public class ScoreTableController {
             MessageDialog.showDialog(res.getMsg());
         }
     }
+
 
 }
