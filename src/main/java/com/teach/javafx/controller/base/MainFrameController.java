@@ -170,8 +170,6 @@ public class MainFrameController {
         initMenuTree(mList);
         contentTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         contentTabPane.setStyle("-fx-background-image: url('SDU-SCP.jpg'); -fx-background-repeat: no-repeat; -fx-background-size: contain;");  //inline选择器
-
-
     }
 
 

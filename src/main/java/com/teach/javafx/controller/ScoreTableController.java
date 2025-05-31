@@ -90,7 +90,7 @@ public class ScoreTableController {
     }
 
     private void setTableViewData() {
-        observableList.clear();
+        observableList.clear();//这里就是清空现有数据了
         Map map;
         Button editButton;
         for (int j = 0; j < scoreList.size(); j++) {
@@ -131,7 +131,7 @@ public class ScoreTableController {
 
         DataRequest req =new DataRequest();
         studentList = HttpRequestUtil.requestOptionItemList("/api/score/getStudentItemOptionList",req); //从后台获取所有学生信息列表集合
-        courseList = HttpRequestUtil.requestOptionItemList("/api/score/getCourseItemOptionList",req); //从后台获取所有学生信息列表集合
+        courseList = HttpRequestUtil.requestOptionItemList("/api/score/getCourseItemOptionList",req); //从后台获取所有课程信息列表集合
         OptionItem item = new OptionItem(null,"0","请选择");
         studentComboBox.getItems().addAll(item);
         studentComboBox.getItems().addAll(studentList);
@@ -234,5 +234,4 @@ public class ScoreTableController {
             MessageDialog.showDialog(res.getMsg());
         }
     }
-
 }
