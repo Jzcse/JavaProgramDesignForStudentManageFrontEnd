@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../css/student-end/course-choose.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.studentEnd.CourseChooseController">
+    <top>
+        <FlowPane>
+            <Button fx:id="courseChooseResultButton" onAction="#onCourseChooseResultButtonClick" text="选课结果">
+                <FlowPane.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </FlowPane.margin>
+            </Button>
+        </FlowPane>
+    </top>
+    <center>
+        <TableView fx:id="courseTableView" styleClass="table">
+            <columns>
+                <TableColumn fx:id="courseNumColumn" prefWidth="100" text="课序号" />
+                <TableColumn fx:id="courseNameColumn" prefWidth="90" text="课程名称" />
+                <TableColumn fx:id="courseCreditColumn" prefWidth="30" text="学分" />
+                <TableColumn fx:id="courseClassroomColumn" prefWidth="70" text="上课教室" />
+                <TableColumn fx:id="courseDayOfWeekColumn" prefWidth="90" text="上课星期" />
+                <TableColumn fx:id="courseTimeColumn" prefWidth="135" text="上课时间段" />
+            </columns>
+         <BorderPane.margin>
+            <Insets right="10.0" />
+         </BorderPane.margin>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+        </TableView>
+    </center>
+    <right>
+        <VBox alignment="TOP_CENTER" prefHeight="1200" BorderPane.alignment="CENTER_RIGHT">
+            <Label alignment="CENTER" prefWidth="300" styleClass="label-title" text="当前课表" />
+            <TableView fx:id="curriculumView" fixedCellSize="50" styleClass="table">
+                <columns>
+                    <TableColumn fx:id="timeColumn" text="时段" />
+                    <TableColumn fx:id="monday" text="星期一" />
+                    <TableColumn fx:id="tuesday" text="星期二" />
+                    <TableColumn fx:id="wednesday" text="星期三" />
+                    <TableColumn fx:id="thursday" text="星期四" />
+                    <TableColumn fx:id="friday" text="星期五" />
+                    <TableColumn fx:id="saturday" text="星期六" />
+                    <TableColumn fx:id="sunday" text="星期日" />
+                </columns>
+            <VBox.margin>
+               <Insets left="10.0" />
+            </VBox.margin>
+            <columnResizePolicy>
+               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            </TableView>
+            <VBox fx:id="credit_box" alignment="BOTTOM_CENTER">
+                <Label alignment="CENTER" styleClass="label-title" text="你当前已选择学分" textFill="WHITE" />
+                <Label fx:id="credit" text="0.0" textFill="WHITE" />
+            </VBox>
+        </VBox>
+    </right>
+</BorderPane>

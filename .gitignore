@@ -37,3 +37,7 @@ mvnw
 mvnw.cmd
 
 logs/
+
+### 编译文件 ###
+
+target/*.class

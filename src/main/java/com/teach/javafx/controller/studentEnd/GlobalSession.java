@@ -3,7 +3,10 @@ package com.teach.javafx.controller.studentEnd;
 public class GlobalSession {
 
     private static GlobalSession instance;
+    private Integer role;// 0 for student and 1 for teacher
     private String personId;
+    private String teacherId;
+    private String studentId;
     private String num;
 
     private GlobalSession() {}
@@ -33,5 +36,21 @@ public class GlobalSession {
 
     public void setNum(String num) {
         this.num = num;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
+
+    public String getTeacherId() {
+        return teacherId;
+    }
+
+    public void setTeacherId(String teacherId) {
+        this.teacherId = teacherId;
     }
 }

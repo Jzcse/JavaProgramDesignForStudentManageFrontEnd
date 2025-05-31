@@ -45,6 +45,47 @@ public class StudentServiceController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
         } catch (IOException e){
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void onCourseChooseBoxClick(MouseEvent mouseEvent) {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/teach/javafx/student-end/course-choose-panel.fxml"));
+            Parent newRoot = loader.load();
+            Stage stage = new Stage();
+            stage.setWidth(1200);
+            stage.setHeight(800);
+            stage.setResizable(false);
+            stage.setTitle("学生选课中心");
+            Scene scene = new Scene(newRoot, 500,400);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+        }
+
+
+    }
+
+    public void onInfoBoxClick(MouseEvent mouseEvent) {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/teach/javafx/student-end/student-info-panel.fxml"));
+            Parent newRoot = loader.load();
+            Stage stage = new Stage();
+            stage.setWidth(1200);
+            stage.setHeight(800);
+            stage.setResizable(false);
+            stage.setTitle("学生个人信息管理");
+            Scene scene = new Scene(newRoot, 500,400);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
             System.err.println(e.getMessage());
         }
     }
