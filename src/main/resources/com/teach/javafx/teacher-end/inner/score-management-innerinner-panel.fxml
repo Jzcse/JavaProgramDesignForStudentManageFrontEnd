@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.teacherEnd.inner.ScoreManagementInnerInnerController">
+    <top>
+        <FlowPane>
+            <Label text="学生姓名">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="name" text="name">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text="学生学号">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="num" text="num">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text="班级">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="classname" text="classname">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" left="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+        </FlowPane>
+    </top>
+    <center>
+        <VBox>
+            <VBox>
+                <Label text="平时"  />
+                <TextField fx:id="usualField"  prefWidth="60"/>
+            </VBox>
+            <VBox>
+                <Label text="期中"  />
+                <TextField fx:id="midField" prefWidth="60"/>
+            </VBox>
+            <VBox>
+                <Label text="期末"  />
+                <TextField fx:id="endField" prefWidth="60"/>
+            </VBox>
+            <FlowPane prefHeight="200.0" prefWidth="20.0">
+                <Button mnemonicParsing="false" text="Button" onAction="#registerScores"/>
+            </FlowPane>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.teach.javafx.controller.teacherEnd.ScoreManagementController"
+            prefHeight="400.0" prefWidth="600.0">
+    <center>
+        <TableView fx:id="tableView">
+            <columns>
+                <TableColumn fx:id="num" text="课程编号" />
+                <TableColumn fx:id="name" text="课程名字" />
+                <TableColumn fx:id="time" text="上课时间" />
+                <TableColumn fx:id="dayOfWeek" text="上课星期" />
+                <TableColumn fx:id="classroom" text="上课教室" />
+                <TableColumn fx:id="stuSum" text="学生总数" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

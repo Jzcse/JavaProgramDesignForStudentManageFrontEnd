@@ -38,4 +38,24 @@ public class TeacherServiceController {
     public void onInfoBoxClick(MouseEvent mouseEvent) {
 
     }
+
+    public void onScoreManagementBoxClick(MouseEvent mouseEvent) {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/teach/javafx/teacher-end/score-management-panel.fxml"));
+            Parent newRoot = loader.load();
+            Stage stage = new Stage();
+            stage.setWidth(800);
+            stage.setHeight(600);
+            stage.setResizable(false);
+            stage.setTitle("分数管理");
+            Scene scene = new Scene(newRoot, 1000,600);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+        }
+
+    }
 }
