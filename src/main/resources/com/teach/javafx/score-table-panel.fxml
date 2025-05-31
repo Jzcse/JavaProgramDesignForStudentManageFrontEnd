@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
@@ -15,7 +16,7 @@
    <top>
        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0">
            <children>
-               <FlowPane alignment="TOP_LEFT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <FlowPane alignment="TOP_LEFT" prefHeight="34.0" prefWidth="275.0" BorderPane.alignment="CENTER">
                    <children>
                        <Button mnemonicParsing="false" onAction="#onAddButtonClick" text="添加">
                            <FlowPane.margin>
@@ -32,6 +33,8 @@
                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </FlowPane.margin>
                        </Button>
+                  <TextField fx:id="courseIdTextField" promptText="请输入要批量导入的课程Id" />
+                  <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImportButtonClick" text="批量导入" />
                    </children>
                </FlowPane>
                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
@@ -79,12 +82,12 @@
                 <TableColumn fx:id="courseNumColumn" prefWidth="120.0" text="课程号" />
                 <TableColumn fx:id="courseNameColumn" prefWidth="140.0" text="课程名" />
                 <TableColumn fx:id="creditColumn" prefWidth="60.0" text="学分" />
-            <TableColumn fx:id="PerformanceMarkColumn" prefWidth="120.0" text="平时分" />
-            <TableColumn fx:id="MidTermMarkColumn" prefWidth="120.0" text="期中考试成绩" />
-            <TableColumn fx:id="FinalTermMarkColumn" prefWidth="120.0" text="期末考试成绩" />
-            <TableColumn fx:id="PerformanceWeightColumn" prefWidth="75.0" text="平时分权重" />
-            <TableColumn fx:id="MidTermWeightColumn" prefWidth="75.0" text="期中考试权重" />
-            <TableColumn fx:id="FinalTermWeightColumn" prefWidth="75.0" text="期末考试权重" />
+            <TableColumn fx:id="performanceMarkColumn" prefWidth="120.0" text="平时分" />
+            <TableColumn fx:id="midTermMarkColumn" prefWidth="120.0" text="期中考试成绩" />
+            <TableColumn fx:id="finalTermMarkColumn" prefWidth="120.0" text="期末考试成绩" />
+            <TableColumn fx:id="performanceWeightColumn" prefWidth="75.0" text="平时分权重" />
+            <TableColumn fx:id="midTermWeightColumn" prefWidth="75.0" text="期中考试权重" />
+            <TableColumn fx:id="finalTermWeightColumn" prefWidth="75.0" text="期末考试权重" />
                 <TableColumn fx:id="markColumn" prefWidth="60.0" text="总成绩" />
                 <TableColumn fx:id="editColumn" prefWidth="60.0" text="操作" />
             </columns>

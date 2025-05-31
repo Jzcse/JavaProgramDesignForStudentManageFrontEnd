@@ -44,17 +44,22 @@ public class ScoreTableController {
     private TableColumn<Map, Button> editColumn;
 
     @FXML
-    private TableColumn<Map,String> PerformanceMarkColumn;
+    private TableColumn<Map,String> performanceMarkColumn;
     @FXML
-    private TableColumn<Map,String> MidTermMarkColumn;
+    private TableColumn<Map,String> midTermMarkColumn;
     @FXML
-    private TableColumn<Map,String> FinalTermMarkColumn;
+    private TableColumn<Map,String> finalTermMarkColumn;
     @FXML
-    private TableColumn<Map,String> PerformanceWeightColumn;
+    private TableColumn<Map,String> performanceWeightColumn;
     @FXML
-    private TableColumn<Map,String> MidTermWeightColumn;
+    private TableColumn<Map,String> midTermWeightColumn;
     @FXML
-    private TableColumn<Map,String> FinalTermWeightColumn;
+    private TableColumn<Map,String> finalTermWeightColumn;
+
+    @FXML
+    private TextField courseIdTextField;
+    @FXML
+    private Button importButton;
 
 
     private ArrayList<Map> scoreList = new ArrayList();  // 学生信息列表数据
@@ -143,12 +148,12 @@ public class ScoreTableController {
         markColumn.setCellValueFactory(new MapValueFactory<>("mark"));
         editColumn.setCellValueFactory(new MapValueFactory<>("edit"));
 
-        PerformanceMarkColumn.setCellValueFactory(new MapValueFactory<>("PerformanceMark"));
-        MidTermMarkColumn.setCellValueFactory(new MapValueFactory<>("MidTermMark"));
-        FinalTermMarkColumn.setCellValueFactory(new MapValueFactory<>("FinalTermMark"));
-        PerformanceWeightColumn.setCellValueFactory(new MapValueFactory<>("PerformanceWeight"));
-        MidTermWeightColumn.setCellValueFactory(new MapValueFactory<>("MidTermWeight"));
-        FinalTermWeightColumn.setCellValueFactory(new MapValueFactory<>("FinalTermWeight"));
+        performanceMarkColumn.setCellValueFactory(new MapValueFactory<>("PerformanceMark"));
+        midTermMarkColumn.setCellValueFactory(new MapValueFactory<>("MidTermMark"));
+        finalTermMarkColumn.setCellValueFactory(new MapValueFactory<>("FinalTermMark"));
+        performanceWeightColumn.setCellValueFactory(new MapValueFactory<>("PerformanceWeight"));
+        midTermWeightColumn.setCellValueFactory(new MapValueFactory<>("MidTermWeight"));
+        finalTermWeightColumn.setCellValueFactory(new MapValueFactory<>("FinalTermWeight"));
 
         DataRequest req =new DataRequest();
         studentList = HttpRequestUtil.requestOptionItemList("/api/score/getStudentItemOptionList",req); //从后台获取所有学生信息列表集合
@@ -263,6 +268,24 @@ public class ScoreTableController {
             MessageDialog.showDialog(res.getMsg());
         }
     }
-
-
-}
+    @FXML
+    private void onImportButtonClick() {
+        if (courseIdTextField.getText().isEmpty()) {
+            MessageDialog.showDialog("请输入课程ID");
+            return;
+        }
+        Integer courseId = Integer.valueOf(courseIdTextField.getText());
+        Map score = new HashMap();
+        score.put("courseId", courseId);
+        DataRequest req = new DataRequest();
+        req.add("score", score);
+        DataResponse res = HttpRequestUtil.request("/api/score/ScoreInitializationByCourse", req);
+        if (res.getCode() == 0) {
+            MessageDialog.showDialog("初始化成功");
+            onQueryButtonClick();
+        } else {
+            MessageDialog.showDialog(res.getMsg());
+        }
+        courseIdTextField.setText("");
+    }
+    }
