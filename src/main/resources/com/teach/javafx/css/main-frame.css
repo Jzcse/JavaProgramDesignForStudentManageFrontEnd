@@ -15,4 +15,17 @@
     -fx-scale-y: 1.01;
     -fx-transition: all 0.2s ease; /* 添加过渡动画 */
 }
+.tree-cell:expanded .tree-disclosure-node .arrow {
+    -fx-background-color: #4a6fa5; /* 箭头颜色 */
+    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 箭头大小 */
+    -fx-shape: "M 4 0 A 4 4 0 0 1 4 8 Z"; /* 箭头形状 */
+}
+.tree-cell:collapsed .tree-disclosure-node .arrow {
+    -fx-background-color: #4a6fa5;
+    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em;
+    -fx-shape: "M 0 4 A 4 4 0 0 1 8 4 Z";
+}
+.tree-cell:hover .tree-disclosure-node .arrow {
+    -fx-background-color: #e74c3c; /* 红色箭头 */
+}
 
