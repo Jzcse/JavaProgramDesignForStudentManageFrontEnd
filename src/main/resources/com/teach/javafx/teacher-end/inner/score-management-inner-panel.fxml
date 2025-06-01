@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.teach.javafx.controller.teacherEnd.inner.ScoreManagementInnerController"
+            prefHeight="400.0" prefWidth="600.0">
+    <top>
+        <FlowPane>
+            <Label text='当前课程'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="courseName" text="课程名称">
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text='分数权重'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text='平时'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="usualWeight" text='平时成绩权重'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text='期中'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="midWeight" text='期中成绩权重'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label text='期末'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Label fx:id="endWeight" text='期末成绩权重'>
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Label>
+            <Button text="修改当前课程权重" onAction="#onChangeClick">
+                <FlowPane.margin>
+                    <Insets left="5" right="5" top="5" bottom="5" />
+                </FlowPane.margin>
+            </Button>
+        </FlowPane>
+    </top>
+    <center>
+        <TableView fx:id="tableView" >
+            <columns>
+                <TableColumn fx:id="num" text="学生学号"/>
+                <TableColumn fx:id="name" text="学生姓名"/>
+                <TableColumn fx:id="classname" text="学生班级"/>
+                <TableColumn fx:id="usualScore" text="平时成绩" />
+                <TableColumn fx:id="midTermScore" text="期中成绩" />
+                <TableColumn fx:id="endTermScore" text="期末成绩" />
+                <TableColumn fx:id="score" text="总成绩"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

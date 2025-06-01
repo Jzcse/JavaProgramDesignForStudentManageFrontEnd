@@ -2,94 +2,95 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.Priority?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.ComboBox?>
 
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.ScoreTableController">
-    <top>
-        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" >
-            <children>
-                <FlowPane alignment="TOP_LEFT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <children>
-                        <Button mnemonicParsing="false" onAction="#onAddButtonClick" text="添加">
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#onEditButtonClick" text="修改">
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#onDeleteButtonClick" text="删除">
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Button>
-                    </children>
-                </FlowPane>
-                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-                <FlowPane alignment="TOP_RIGHT"  prefHeight="40.0" prefWidth="500.0" BorderPane.alignment="CENTER">
-                    <children>
-                        <Label text="学生"  >
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Label>
-                        <ComboBox fx:id="studentComboBox"  >
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </ComboBox>
-                        <Label text="课程"  >
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Label>
-                        <ComboBox fx:id="courseComboBox"  >
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </ComboBox>
-                        <Button mnemonicParsing="false" onAction="#onQueryButtonClick" text="查询">
-                            <FlowPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </FlowPane.margin>
-                        </Button>
-                    </children>
-                </FlowPane>
-            </children>
-            <padding>
-                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-            </padding>
-        </HBox>
-    </top>
-    <center>
-        <HBox spacing="10.0" BorderPane.alignment="CENTER">
-            <TableView fx:id="dataTableView" HBox.hgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="studentNumColumn" prefWidth="120.0" text="学号" />
-                    <TableColumn fx:id="studentNameColumn" prefWidth="90.0" text="姓名" />
-                    <TableColumn fx:id="classNameColumn" prefWidth="140.0" text="班级" />
-                    <TableColumn fx:id="courseNumColumn" prefWidth="120.0" text="课程号" />
-                    <TableColumn fx:id="courseNameColumn" prefWidth="140.0" text="课程名" />
-                    <TableColumn fx:id="creditColumn" prefWidth="60.0" text="学分" />
-                    <TableColumn fx:id="markColumn" prefWidth="60.0" text="成绩" />
-                    <TableColumn fx:id="editColumn" prefWidth="60.0" text="操作" />
-                </columns>
-            </TableView>
-        </HBox>
-    </center>
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.teach.javafx.controller.ScoreTableController">
+   <top>
+       <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0">
+           <children>
+               <FlowPane alignment="TOP_LEFT" prefHeight="34.0" prefWidth="275.0" BorderPane.alignment="CENTER">
+                   <children>
+                       <Button mnemonicParsing="false" onAction="#onAddButtonClick" text="添加">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Button>
+                       <Button mnemonicParsing="false" onAction="#onEditButtonClick" text="修改">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Button>
+                       <Button mnemonicParsing="false" onAction="#onDeleteButtonClick" text="删除">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Button>
+                  <TextField fx:id="courseIdTextField" promptText="请输入要批量导入的课程Id" />
+                  <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImportButtonClick" text="批量导入" />
+                   </children>
+               </FlowPane>
+               <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+               <FlowPane alignment="TOP_RIGHT" prefHeight="40.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+                   <children>
+                       <Label text="学生">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Label>
+                       <ComboBox fx:id="studentComboBox">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </ComboBox>
+                       <Label text="课程">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Label>
+                       <ComboBox fx:id="courseComboBox">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </ComboBox>
+                       <Button mnemonicParsing="false" onAction="#onQueryButtonClick" text="查询">
+                           <FlowPane.margin>
+                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </FlowPane.margin>
+                       </Button>
+                   </children>
+               </FlowPane>
+           </children>
+           <padding>
+               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+           </padding>
+       </HBox>
+   </top>
+   <center>
+        <TableView fx:id="dataTableView">
+            <columns>
+                <TableColumn fx:id="studentNumColumn" prefWidth="120.0" text="学号" />
+                <TableColumn fx:id="studentNameColumn" prefWidth="90.0" text="姓名" />
+                <TableColumn fx:id="classNameColumn" prefWidth="140.0" text="班级" />
+                <TableColumn fx:id="courseNumColumn" prefWidth="120.0" text="课程号" />
+                <TableColumn fx:id="courseNameColumn" prefWidth="140.0" text="课程名" />
+                <TableColumn fx:id="creditColumn" prefWidth="60.0" text="学分" />
+            <TableColumn fx:id="performanceMarkColumn" prefWidth="120.0" text="平时分" />
+            <TableColumn fx:id="midTermMarkColumn" prefWidth="120.0" text="期中考试成绩" />
+            <TableColumn fx:id="finalTermMarkColumn" prefWidth="120.0" text="期末考试成绩" />
+            <TableColumn fx:id="performanceWeightColumn" prefWidth="75.0" text="平时分权重" />
+            <TableColumn fx:id="midTermWeightColumn" prefWidth="75.0" text="期中考试权重" />
+            <TableColumn fx:id="finalTermWeightColumn" prefWidth="75.0" text="期末考试权重" />
+                <TableColumn fx:id="markColumn" prefWidth="60.0" text="总成绩" />
+                <TableColumn fx:id="editColumn" prefWidth="60.0" text="操作" />
+            </columns>
+        </TableView>
+   </center>
 </BorderPane>
