@@ -1,0 +1,104 @@
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: white;
+    -fx-padding: 0;
+}
+
+/* 美化表头区域 */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+    -fx-background-radius: 5px 5px 0 0;
+    -fx-padding: 0 0 5px 0;
+}
+
+/* 美化表头单元格 */
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 35px;
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: #d0d0d0;
+}
+
+/* 表头文本样式 */
+.table-view .column-header .label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 5px;
+}
+
+/* 表头排序箭头样式 */
+.table-view .column-header .sort-order-dot {
+    -fx-background-color: #666666;
+}
+
+/* 去掉表格的线 */
+.table-view .table-cell {
+    -fx-border-color: transparent;
+}
+
+/* 去除交替行的背景色 */
+.table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #e8f4ff !important;
+}
+
+/* 修改选中行的颜色为蓝色 */
+.table-row-cell:selected {
+    -fx-background-color: #add8e6 !important;
+}
+.addButton {
+    -fx-background-color: #4a6fa5;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+.addButton:hover {
+    -fx-background-color: #3b5a80;
+}
+.addButton:pressed {
+    -fx-background-color: #2c4766;
+}
+.editButton {
+    -fx-background-color: #4a6fa5;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+.editButton:hover {
+    -fx-background-color: #3b5a80;
+}
+.editButton:pressed {
+    -fx-background-color: #2c4766;
+}
+.deleteButton {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+.deleteButton:hover {
+    -fx-background-color: #8B0000;
+}
+.deleteButton:pressed {
+    -fx-background-color: #2c4766;
+}
+.queryButton {
+    -fx-background-color: #4a6fa5;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+.queryButton:hover {
+    -fx-background-color: #3b5a80;
+}
+.queryButton:pressed {
+    -fx-background-color: #2c4766;
+}

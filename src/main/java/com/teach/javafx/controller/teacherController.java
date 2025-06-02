@@ -99,11 +99,7 @@ public class teacherController extends ToolController {
     @FXML
     private Button saveButton;
     @FXML
-    private Button familyButton;
-    @FXML
     private Button editButton;
-    @FXML
-    private Button importFeeButton;
     @FXML
     private Button exportPdfButton; // 新增：导出PDF按钮
 
@@ -251,10 +247,6 @@ public class teacherController extends ToolController {
         setEditAble(false);
         saveButton.setVisible(false);
         saveButton.setManaged(false);
-        familyButton.setManaged(true);
-        familyButton.setVisible(true);
-        importFeeButton.setVisible(true);
-        importFeeButton.setManaged(true);
         editButton.setManaged(true);
         editButton.setVisible(true);
         exportPdfButton.setManaged(true);
@@ -374,10 +366,6 @@ public class teacherController extends ToolController {
         saveButton.setVisible(true);
         saveButton.setManaged(true);
         saveButton.setText("确定添加");
-        familyButton.setManaged(false);
-        familyButton.setVisible(false);
-        importFeeButton.setVisible(false);
-        importFeeButton.setManaged(false);
         editButton.setManaged(false);
         editButton.setVisible(false);
         exportPdfButton.setManaged(false);
@@ -594,10 +582,6 @@ public class teacherController extends ToolController {
         saveButton.setVisible(true);
         saveButton.setManaged(true);
         saveButton.setText("保存");
-        familyButton.setManaged(false);
-        familyButton.setVisible(false);
-        importFeeButton.setVisible(false);
-        importFeeButton.setManaged(false);
         editButton.setManaged(false);
         editButton.setVisible(false);
     }

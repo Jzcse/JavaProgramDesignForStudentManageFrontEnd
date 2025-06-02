@@ -1,4 +1,4 @@
-#loginButton {
+.login {
     -fx-background-color: #007BFF;
     -fx-text-fill: #FFFFFF;
     -fx-border-color: #007BFF;
@@ -9,12 +9,12 @@
     -fx-pref-width: 80px;
 }
 
-#loginButton:hover {
+.login:hover {
     -fx-background-color: #0056b3;
     -fx-border-color: #0056b3
 }
 
-#loginButton:pressed {
+.login:pressed {
     -fx-background-color: #0056b3;
     -fx-border-color: #003f80;
     -fx-scale-x: 0.95;

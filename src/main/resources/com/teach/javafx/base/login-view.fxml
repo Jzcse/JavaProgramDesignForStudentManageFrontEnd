@@ -47,5 +47,9 @@
             <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="input" />
         </GridPane>
     </HBox>
-    <Button fx:id="loginButton" onAction="#onLoginButtonClick" text="登录" styleClass="" />
+    <HBox spacing="12">
+        <Button fx:id="loginButton" onAction="#onLoginButtonClick" text="登录" styleClass="login"  />
+        <Button fx:id="changeForStu" onAction="#onLoginForStuButtonClick" text="学生端" styleClass="login" />
+        <Button fx:id="changeForTea" onAction="#onLoginForTeaButtonClick" text="教师端" styleClass="login" />
+    </HBox>
 </VBox>

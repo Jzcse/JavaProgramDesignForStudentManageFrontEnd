@@ -6,6 +6,7 @@ import com.teach.javafx.controller.studentEnd.GlobalSession;
 import com.teach.javafx.request.*;
 import com.teach.javafx.util.CommonMethod;
 import javafx.animation.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,6 +26,8 @@ import java.util.Map;
  *  @FXML 方法 对应于fxml文件中的 on***Click的属性  如onLoginButtonClick() 对应onAction="#onLoginButtonClick"
  */
 public class LoginController {
+    public Button changeForStu;
+    public Button changeForTea;
     @FXML
     private TextField usernameField;
     @FXML
@@ -93,5 +96,15 @@ public class LoginController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void onLoginForStuButtonClick(ActionEvent actionEvent) {
+        usernameField.setText("202400300010");
+        onLoginButtonClick();
+    }
+
+    public void onLoginForTeaButtonClick(ActionEvent actionEvent) {
+        usernameField.setText("202400300002");
+        onLoginButtonClick();
     }
 }

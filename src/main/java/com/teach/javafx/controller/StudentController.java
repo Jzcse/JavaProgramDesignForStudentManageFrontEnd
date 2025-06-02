@@ -122,8 +122,6 @@ public class StudentController extends ToolController {
     @FXML
     private Button saveButton;
     @FXML
-    private Button importFeeButton;
-    @FXML
     private Button familyButton;
     @FXML
     private Button editButton;
@@ -292,8 +290,6 @@ public class StudentController extends ToolController {
         saveButton.setVisible(false);
         editButton.setManaged(true);
         editButton.setVisible(true);
-        importFeeButton.setVisible(true);
-        importFeeButton.setManaged(true);
         familyButton.setManaged(true);
         familyButton.setVisible(true);
         changeStudentInfo();
@@ -330,8 +326,6 @@ public class StudentController extends ToolController {
         editButton.setManaged(false);
         familyButton.setManaged(false);
         familyButton.setVisible(false);
-        importFeeButton.setVisible(false);
-        importFeeButton.setManaged(false);
         isNew = true;
     }
 
@@ -470,8 +464,6 @@ public class StudentController extends ToolController {
         saveButton.setManaged(true);
         familyButton.setManaged(false);
         familyButton.setVisible(false);
-        importFeeButton.setVisible(false);
-        importFeeButton.setManaged(false);
         saveButton.setText("保存");
     }
 

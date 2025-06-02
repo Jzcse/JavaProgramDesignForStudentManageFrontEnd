@@ -280,12 +280,17 @@ public class ScoreTableController {
         DataRequest req = new DataRequest();
         req.add("score", score);
         DataResponse res = HttpRequestUtil.request("/api/score/ScoreInitializationByCourse", req);
-        if (res.getCode() == 0) {
-            MessageDialog.showDialog("初始化成功");
-            onQueryButtonClick();
+        if (res != null) {
+            if (res.getCode() == 0) {
+                MessageDialog.showDialog("初始化成功");
+                onQueryButtonClick();
+            } else {
+                MessageDialog.showDialog(res.getMsg());
+            }
+            courseIdTextField.setText("");
         } else {
-            MessageDialog.showDialog(res.getMsg());
+            MessageDialog.showDialog("请检查网络连接！");
         }
-        courseIdTextField.setText("");
+
     }
     }
