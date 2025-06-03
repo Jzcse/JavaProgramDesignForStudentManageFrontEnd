@@ -71,7 +71,7 @@ public class ScoreManagementInnerInnerController extends ToolController {
         map.put("courseId", courseId);
         map.put("markOfPerformance", usualField.getText());
         map.put("markOfMidTerm", midField.getText());
-        map.put("markOfEndTerm", endField.getText());
+        map.put("markOfFinalTerm", endField.getText());
         dataRequest.add("score", map);
         DataResponse dataResponse = HttpRequestUtil.request("/api/score/rankScore", dataRequest);
         if (dataResponse!= null) {

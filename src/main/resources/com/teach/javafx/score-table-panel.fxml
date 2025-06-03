@@ -33,7 +33,7 @@
                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </FlowPane.margin>
                        </Button>
-                  <TextField fx:id="courseIdTextField" promptText="请输入要批量导入的课程Id" />
+                  <TextField fx:id="courseIdTextField" promptText="请输入要批量导入的课序号" />
                   <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImportButtonClick" text="批量导入" />
                    </children>
                </FlowPane>

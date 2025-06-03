@@ -256,10 +256,6 @@ public class teacherController extends ToolController {
     }
 
     public void displayPhoto() {
-        if (personId == null) {
-            MessageDialog.showDialog("未选择教师");
-            return;
-        }
         try {
             // 获取当前文件的路径并设置图片文件保存位置
             File saveDir;
@@ -406,6 +402,7 @@ public class teacherController extends ToolController {
                 if (dataResponse != null) {
                     if (dataResponse.getCode() == 0) {
                         MessageDialog.showDialog("删除成功！");
+                        dataTableView.getSelectionModel().clearSelection();
                         //刷新教师数量及页码数
                         refreshPageCount();
                         //刷新表格

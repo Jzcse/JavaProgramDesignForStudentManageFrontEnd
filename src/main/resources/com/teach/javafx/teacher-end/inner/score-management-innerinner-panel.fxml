@@ -54,7 +54,7 @@
                 <TextField fx:id="endField" prefWidth="60"/>
             </VBox>
             <FlowPane prefHeight="200.0" prefWidth="20.0">
-                <Button mnemonicParsing="false" text="Button" onAction="#registerScores"/>
+                <Button mnemonicParsing="false" text="提交" onAction="#registerScores"/>
             </FlowPane>
         </VBox>
     </center>
