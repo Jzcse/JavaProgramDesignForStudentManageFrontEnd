@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ScoreTableController {
     @FXML
@@ -274,12 +276,19 @@ public class ScoreTableController {
             MessageDialog.showDialog("请输入课程ID");
             return;
         }
-        Integer courseId = Integer.valueOf(courseIdTextField.getText());
+        String courseNum = String.valueOf(courseIdTextField.getText());
+        DataRequest req = new DataRequest();
+        Map course = new HashMap();
+        course.put("num", courseNum);
+        req.add("course", course);
+        DataResponse res = HttpRequestUtil.request("/api/course/getCourseIdByNum", req);
+        Map result = (Map) res.getData();
+        Integer courseId = CommonMethod.getInteger(result, "courseId");
         Map score = new HashMap();
         score.put("courseId", courseId);
-        DataRequest req = new DataRequest();
+
         req.add("score", score);
-        DataResponse res = HttpRequestUtil.request("/api/score/ScoreInitializationByCourse", req);
+        res = HttpRequestUtil.request("/api/score/ScoreInitializationByCourse", req);
         if (res != null) {
             if (res.getCode() == 0) {
                 MessageDialog.showDialog("初始化成功");
