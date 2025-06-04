@@ -1,14 +1,24 @@
 package com.teach.javafx.controller;
 
-import com.itextpdf.kernel.colors.DeviceRgb;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.properties.*;
+//import com.itextpdf.kernel.colors.Color;
+//import com.itextpdf.kernel.colors.DeviceRgb;
+//import com.itextpdf.kernel.pdf.PdfDocument;
+//import com.itextpdf.kernel.pdf.PdfWriter;
+//import com.itextpdf.layout.Document;
+//import com.itextpdf.layout.borders.Border;
+//import com.itextpdf.layout.borders.SolidBorder;
+//import com.itextpdf.layout.element.*;
+//import com.itextpdf.layout.element.Cell;
+//import com.itextpdf.layout.properties.*;
+import java.awt.*;
+
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.teach.javafx.MainApplication;
 import com.teach.javafx.controller.base.LocalDateStringConverter;
 import com.teach.javafx.controller.base.ToolController;
@@ -19,6 +29,8 @@ import com.teach.javafx.request.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,12 +50,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.stage.FileChooser;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.TextAlignment;
+//import com.itextpdf.kernel.font.PdfFont;
+//import com.itextpdf.kernel.font.PdfFontFactory;
+//import com.itextpdf.kernel.geom.PageSize;
+//import com.itextpdf.layout.element.Paragraph;
+//import com.itextpdf.layout.element.Table;
+//import com.itextpdf.layout.properties.TextAlignment;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -761,234 +773,246 @@ public class StudentController extends ToolController {
 
 
 
+
     public static void generateStudentPdf(List<Student> students, List<Award> awards, String filePath) throws IOException {
         File file = new File(filePath);
         file.getParentFile().mkdirs();
 
-        try (PdfWriter writer = new PdfWriter(file);
-             PdfDocument pdf = new PdfDocument(writer);
-             Document document = new Document(pdf, PageSize.A4)) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+             Document document = new Document(PageSize.A4)) {
 
+            PdfWriter writer = PdfWriter.getInstance(document, fos);
+            document.open();
             document.setMargins(25, 25, 25, 25);
 
-            DeviceRgb secondaryColor = new DeviceRgb(26, 35, 126);
-            DeviceRgb textColor = new DeviceRgb(33, 33, 33);
-            DeviceRgb borderColor = new DeviceRgb(200, 200, 200);
+            Color secondaryColor = new Color(26, 35, 126);
+            Color textColor = new Color(33, 33, 33);
+            Color borderColor = new Color(200, 200, 200);
 
-            PdfFont regularFont = PdfFontFactory.createFont(
-                    "STSong-Light",
-                    "UniGB-UCS2-H",
-                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
-            );
-            PdfFont boldFont = PdfFontFactory.createFont(
-                    "STSongStd-Light",
-                    "UniGB-UCS2-H",
-                    PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
-            );
+            try {
+                BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.EMBEDDED);
+                Font regularFont = new Font(baseFont, 10, Font.NORMAL, textColor);
+                Font boldFont = new Font(baseFont, 14, Font.BOLD, secondaryColor);
+                Font headerFont = new Font(baseFont, 20, Font.BOLD, secondaryColor); // 头部姓名专用字体，放大为20pt
 
-            for (Student student : students) {
-                Div resumeContainer = new Div()
-                        .setBorder(new SolidBorder(borderColor, 1))
-                        .setPadding(20)
-                        .setMarginBottom(20);
+                for (Student student : students) {
+                    // 创建简历容器表格
+                    PdfPTable containerTable = new PdfPTable(1);
+                    containerTable.setWidthPercentage(100);
+                    containerTable.setSpacingAfter(20f);
+                    containerTable.getDefaultCell().setBorder(Rectangle.BOX);
+                    containerTable.getDefaultCell().setBorderColor(borderColor);
+                    containerTable.getDefaultCell().setPadding(20);
 
-                Table headerTable = new Table(new float[]{20, 80})
-                        .setWidth(UnitValue.createPercentValue(100))
-                        .setMarginBottom(15);
+                    // 头部表格（左侧照片，右侧个人信息）
+                    PdfPTable headerTable = new PdfPTable(new float[]{1, 3}); // 照片:信息 = 1:3 比例
+                    headerTable.setWidthPercentage(100);
+                    headerTable.setSpacingAfter(15f);
 
-                // 左侧空白占位框
-                Cell placeholderCell = new Cell()
-                        .setBorder(Border.NO_BORDER)
-                        .setPadding(5)
-                        .setHeight(100)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    // 左侧照片占位框
+                    PdfPCell photoCell = new PdfPCell();
+                    photoCell.setBorder(Rectangle.NO_BORDER);
+                    photoCell.setPadding(5);
+                    photoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    photoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-                Div placeholderDiv = new Div()
-                        .setHeight(90)
-                        .setWidth(80)
-                        .setBorder(new SolidBorder(borderColor, 1));
+                    PdfPTable photoInnerTable = new PdfPTable(1);
+                    photoInnerTable.setTotalWidth(80);
+                    photoInnerTable.setLockedWidth(true);
+                    PdfPCell photoInnerCell = new PdfPCell();
+                    photoInnerCell.setFixedHeight(90);
+                    photoInnerCell.setBorder(Rectangle.BOX);
+                    photoInnerCell.setBorderColor(borderColor);
+                    photoInnerTable.addCell(photoInnerCell);
 
-                placeholderCell.add(placeholderDiv);
-                headerTable.addCell(placeholderCell);
+                    photoCell.addElement(photoInnerTable);
+                    headerTable.addCell(photoCell);
 
-                // 右侧空白单元格
-                Cell emptyCell = new Cell()
-                        .setBorder(Border.NO_BORDER)
-                        .setPadding(5);
-                headerTable.addCell(emptyCell);
+                    // 右侧个人信息
+                    PdfPCell infoCell = new PdfPCell();
+                    infoCell.setBorder(Rectangle.NO_BORDER);
+                    infoCell.setPaddingTop(10);  // 顶部留出适当空间
+                    infoCell.setPaddingLeft(15); // 左侧留出适当空间
+                    infoCell.setPaddingRight(5); // 右侧减少空间
+                    infoCell.setPaddingBottom(5); // 底部减少空间
+                    infoCell.setVerticalAlignment(Element.ALIGN_TOP);
 
-                resumeContainer.add(headerTable);
+                    // 学生姓名（放大字号，突出显示）
+                    Paragraph namePara = new Paragraph(student.getName(), headerFont);
+                    namePara.setAlignment(Element.ALIGN_LEFT);
+                    namePara.setSpacingAfter(3f); // 减少姓名下方间距
 
-                // 个人资料部分，添加原头部信息文字内容
-                resumeContainer.add(createSectionTitle("个人资料", boldFont, secondaryColor));
-                Table personalInfoTable = new Table(1)
-                        .setWidth(UnitValue.createPercentValue(100))
-                        .setMarginTop(3);
+                    // 其他个人信息：使用更紧凑的布局
+                    StringBuilder infoBuilder = new StringBuilder();
 
-                String studentType = student.getType() != null? student.getType() : "";
-                String numInfo = "学号: " + student.getNum();
-                String majorInfo = "专业: " + student.getMajor();
-                String classNameInfo = "班级: " + student.getClassName();
+                    // 添加关键信息，使用竖线分隔（更紧凑）
+                    infoBuilder.append("学号：").append(student.getNum()).append("    ")
+                            .append("性别：").append(student.getGenderName()).append("\n");
+                    infoBuilder.append("专业：").append(student.getMajor()).append("    ")
+                            .append("班级：").append(student.getClassName()).append("\n");
+                    infoBuilder.append("生日：").append(student.getBirthday()).append("    ")
+                            .append("学生类型：").append(student.getType() != null ? student.getType() : "暂无信息");
 
-                if (!studentType.isEmpty()) {
-                    addInfoRow(personalInfoTable, "学生类型", studentType, regularFont, textColor);
-                }
-                addInfoRow(personalInfoTable, "学号", numInfo, regularFont, textColor);
-                addInfoRow(personalInfoTable, "专业", majorInfo, regularFont, textColor);
-                addInfoRow(personalInfoTable, "班级", classNameInfo, regularFont, textColor);
+                    Paragraph infoPara = new Paragraph(infoBuilder.toString(), regularFont);
+                    infoPara.setLeading(14f); // 设置行间距（数值越小越紧凑）
+                    infoPara.setAlignment(Element.ALIGN_LEFT);
 
-                addInfoRow(personalInfoTable, "性别", student.getGenderName(), regularFont, textColor);
-                addInfoRow(personalInfoTable, "生日", student.getBirthday(), regularFont, textColor);
-                addInfoRow(personalInfoTable, "身份证号", student.getCard(), regularFont, textColor);
-                resumeContainer.add(personalInfoTable);
+                    infoCell.addElement(namePara);
+                    infoCell.addElement(infoPara);
+                    headerTable.addCell(infoCell);
 
-                // 联系方式部分
-                resumeContainer.add(createSectionTitle("联系方式", boldFont, secondaryColor)
-                        .setMarginTop(15));
-                Table contactTable = new Table(1)
-                        .setWidth(UnitValue.createPercentValue(100))
-                        .setMarginTop(3);
-                addInfoRow(contactTable, "电话", student.getPhone(), regularFont, textColor);
-                addInfoRow(contactTable, "邮箱", student.getEmail(), regularFont, textColor);
-                addInfoRow(contactTable, "地址", student.getAddress(), regularFont, textColor);
-                resumeContainer.add(contactTable);
+                    containerTable.addCell(headerTable);
 
-                // 教育背景部分
-                resumeContainer.add(createSectionTitle("教育背景", boldFont, secondaryColor)
-                        .setMarginTop(15));
-                Table educationTable = new Table(1)
-                        .setWidth(UnitValue.createPercentValue(100))
-                        .setMarginTop(3);
-                addInfoRow(educationTable, "学院/部门", student.getDept(), regularFont, textColor);
-                addInfoRow(educationTable, "专业", student.getMajor(), regularFont, textColor);
-                addInfoRow(educationTable, "班级", student.getClassName(), regularFont, textColor);
-                resumeContainer.add(educationTable);
+                    // 个人资料部分（保留原内容，但移除已在头部显示的信息）
+                    containerTable.addCell(createSectionTitle("个人资料", boldFont, secondaryColor));
+                    PdfPTable personalInfoTable = createInfoTable();
 
-                // 获奖情况部分
-                resumeContainer.add(createSectionTitle("获奖情况", boldFont, secondaryColor)
-                        .setMarginTop(15));
+                    addInfoRow(personalInfoTable, "身份证号", student.getCard(), regularFont);
+                    // 其他个人资料信息...
+                    containerTable.addCell(personalInfoTable);
 
-                if (awards != null && !awards.isEmpty()) {
-                    Table awardsTable = new Table(new float[]{40, 30, 30})
-                            .setWidth(UnitValue.createPercentValue(100))
-                            .setMarginTop(5);
+                    // 联系方式
+                    containerTable.addCell(createSectionTitle("联系方式", boldFont, secondaryColor));
+                    PdfPTable contactTable = createInfoTable();
+                    addInfoRow(contactTable, "电话", student.getPhone(), regularFont);
+                    addInfoRow(contactTable, "邮箱", student.getEmail(), regularFont);
+                    addInfoRow(contactTable, "地址", student.getAddress(), regularFont);
+                    containerTable.addCell(contactTable);
 
-                    awardsTable.addHeaderCell(createTableHeaderCell("奖项名称", boldFont));
-                    awardsTable.addHeaderCell(createTableHeaderCell("奖项等级", boldFont));
-                    awardsTable.addHeaderCell(createTableHeaderCell("获奖时间", boldFont));
+                    // 教育背景
+                    containerTable.addCell(createSectionTitle("教育背景", boldFont, secondaryColor));
+                    PdfPTable educationTable = createInfoTable();
+                    addInfoRow(educationTable, "学院/部门", student.getDept(), regularFont);
+                    containerTable.addCell(educationTable);
 
-                    for (Award award : awards) {
-                        awardsTable.addCell(createTableCell(
-                                award.getAwardName() != null? award.getAwardName() : "未填写",
-                                regularFont));
-                        awardsTable.addCell(createTableCell(
-                                award.getAwardLevel() != null? award.getAwardLevel() : "未填写",
-                                regularFont));
-                        awardsTable.addCell(createTableCell(
-                                award.getAwardTime() != null? award.getAwardTime() : "未填写",
-                                regularFont));
+                    // 获奖情况
+                    containerTable.addCell(createSectionTitle("获奖情况", boldFont, secondaryColor));
+                    if (awards != null && !awards.isEmpty()) {
+                        PdfPTable awardsTable = new PdfPTable(3);
+                        awardsTable.setWidthPercentage(100);
+                        awardsTable.setSpacingBefore(5f);
+
+                        awardsTable.addCell(createTableHeaderCell("奖项名称", boldFont));
+                        awardsTable.addCell(createTableHeaderCell("奖项等级", boldFont));
+                        awardsTable.addCell(createTableHeaderCell("获奖时间", boldFont));
+
+                        for (Award award : awards) {
+                            awardsTable.addCell(createTableCell(
+                                    award.getAwardName() != null ? award.getAwardName() : "未填写",
+                                    regularFont
+                            ));
+                            awardsTable.addCell(createTableCell(
+                                    award.getAwardLevel() != null ? award.getAwardLevel() : "未填写",
+                                    regularFont
+                            ));
+                            awardsTable.addCell(createTableCell(
+                                    award.getAwardTime() != null ? award.getAwardTime() : "未填写",
+                                    regularFont
+                            ));
+                        }
+                        containerTable.addCell(awardsTable);
+                    } else {
+                        PdfPCell noAwardCell = new PdfPCell(new Phrase("暂无获奖信息", regularFont));
+                        noAwardCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        noAwardCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        noAwardCell.setFixedHeight(30);
+                        noAwardCell.setBorder(Rectangle.NO_BORDER);
+                        containerTable.addCell(noAwardCell);
                     }
-                    resumeContainer.add(awardsTable);
-                } else {
-                    resumeContainer.add(new Paragraph("暂无获奖信息")
-                            .setFont(regularFont)
-                            .setFontSize(10)
-                            .setFontColor(textColor)
-                            .setTextAlignment(TextAlignment.CENTER)
-                            .setMarginTop(10));
+
+                    // 个人简介
+                    containerTable.addCell(createSectionTitle("个人简介", boldFont, secondaryColor));
+                    String introduction = student.getIntroduce() != null ? student.getIntroduce() : "暂无简介";
+                    Paragraph introPara = new Paragraph(introduction, regularFont);
+                    introPara.setAlignment(Element.ALIGN_JUSTIFIED);
+                    introPara.setLeading(16.5f); // 1.5 * 11
+                    containerTable.addCell(introPara);
+
+                    document.add(containerTable);
+
+                    // 添加分页
+                    if (students.indexOf(student) < students.size() - 1) {
+                        document.newPage();
+                    }
                 }
 
-                // 个人简介部分
-                resumeContainer.add(createSectionTitle("个人简介", boldFont, secondaryColor)
-                        .setMarginTop(15));
-                String introduction = student.getIntroduce() != null? student.getIntroduce() : "暂无简介";
-                Paragraph introPara = new Paragraph(introduction)
-                        .setFont(regularFont)
-                        .setFontSize(11)
-                        .setTextAlignment(TextAlignment.JUSTIFIED)
-                        .setMultipliedLeading(1.5f)
-                        .setMarginTop(10)
-                        .setPadding(5);
+                // 页脚
+                Paragraph footer = new Paragraph(
+                        "生成时间: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        new Font(baseFont, 8, Font.NORMAL, new Color(150, 150, 150))
+                );
+                footer.setAlignment(Element.ALIGN_CENTER);
+                document.add(footer);
 
-                resumeContainer.add(introPara);
-
-                document.add(resumeContainer);
-
-                if (students.indexOf(student) < students.size() - 1) {
-                    document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-                }
+            } catch (DocumentException e) {
+                e.printStackTrace();
             }
-
-            // 页脚
-            Paragraph footer = new Paragraph("生成时间: " +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                    .setFont(regularFont)
-                    .setFontSize(8)
-                    .setFontColor(new DeviceRgb(150, 150, 150))
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setMarginTop(5);
-            document.add(footer);
         }
     }
 
-    private static Paragraph createSectionTitle(String title, PdfFont font, DeviceRgb color) {
-        return new Paragraph(title)
-                .setFont(font)
-                .setFontSize(14)
-                .setFontColor(color)
-                .setMarginBottom(8)
-                .setBorderBottom(new SolidBorder(new DeviceRgb(224, 224, 224), 0.7f))
-                .setPaddingBottom(5);
-    }
-
-    private static void addInfoRow(Table table, String label, String value, PdfFont font, DeviceRgb textColor) {
+    // 辅助方法 - 创建信息行（修改为两列布局）
+    private static void addInfoRow(PdfPTable table, String label, String value, Font font) {
         if (value == null || value.isEmpty()) {
             value = "暂无信息";
         }
 
-        Paragraph p = new Paragraph()
-                .setFont(font)
-                .setFontSize(10)
-                .setMargin(2);
+        Font labelFont = new Font(font.getBaseFont(), font.getSize(), Font.NORMAL, new Color(97, 97, 97));
+        Font valueFont = new Font(font.getBaseFont(), font.getSize(), Font.NORMAL, font.getColor());
 
-        p.add(new Text(label + ": ").setFontColor(new DeviceRgb(97, 97, 97)).setFont(font));
-        p.add(new Text(value).setFontColor(textColor).setFont(font));
+        PdfPCell labelCell = new PdfPCell(new Phrase(label + ":", labelFont));
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setPadding(3);
 
-        Cell cell = new Cell()
-                .setBorder(Border.NO_BORDER)
-                .setPadding(3)
-                .setPaddingLeft(5)
-                .add(p);
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setPadding(3);
 
-        table.addCell(cell);
+        table.addCell(labelCell);
+        table.addCell(valueCell);
     }
 
-    private static Cell createTableHeaderCell(String text, PdfFont font) {
-        return new Cell()
-                .setBackgroundColor(new DeviceRgb(240, 240, 240))
-                .setBorder(new SolidBorder(new DeviceRgb(200, 200, 200), 0.5f))
-                .setPadding(5)
-                .setTextAlignment(TextAlignment.CENTER)
-                .add(new Paragraph(text)
-                        .setFont(font)
-                        .setFontSize(10)
-                        .setBold());
+    private static PdfPCell createSectionTitle(String title, Font font, Color color) {
+        PdfPCell cell = new PdfPCell(new Phrase(title, font));
+        cell.setBorder(Rectangle.BOTTOM);
+        cell.setBorderColor(new Color(224, 224, 224));
+        cell.setBorderWidth(0.7f);
+        cell.setPaddingBottom(5);
+        cell.setPaddingTop(5);
+        return cell;
     }
 
-    private static Cell createTableCell(String text, PdfFont font) {
-        return new Cell()
-                .setBorder(new SolidBorder(new DeviceRgb(240, 240, 240), 0.5f))
-                .setPadding(5)
-                .setTextAlignment(TextAlignment.CENTER)
-                .add(new Paragraph(text)
-                        .setFont(font)
-                        .setFontSize(9));
+    private static PdfPTable createInfoTable() {
+        PdfPTable table = new PdfPTable(1);
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+        return table;
+    }
+
+
+    private static PdfPCell createTableHeaderCell(String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, new Font(font.getBaseFont(), font.getSize(), Font.BOLD)));
+        cell.setBackgroundColor(new Color(240, 240, 240));
+        cell.setBorderWidth(0.5f);
+        cell.setBorderColor(new Color(200, 200, 200));
+        cell.setPadding(5);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
+    }
+
+    private static PdfPCell createTableCell(String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setBorderWidth(0.5f);
+        cell.setBorderColor(new Color(240, 240, 240));
+        cell.setPadding(5);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
     }
 
     @FXML
     public void onExportPdfButtonClick() {
         showExportHelpDialog();
         try {
+            // 保持原有逻辑，获取学生和获奖信息
             Map<String, Object> form = dataTableView.getSelectionModel().getSelectedItem();
             if (form == null) {
                 MessageDialog.showDialog("没有选择，不能导出");
@@ -999,28 +1023,20 @@ public class StudentController extends ToolController {
             DataRequest req = new DataRequest();
             req.add("numName", targetStudentNum);
 
-            // 获取学生信息
             DataResponse res = HttpRequestUtil.request("/api/student/getStudentList", req);
-            // 获取获奖信息
             DataResponse response = HttpRequestUtil.request("/api/award/getRelatedStudentForPdf", req);
-            List<Map<String, Object>> students = res != null && res.getCode() == 0
-                    ? (List<Map<String, Object>>) res.getData()
-                    : null;
 
-            List<Map<String, Object>> relatedStudentList = response != null && response.getCode() == 0
-                    ? (List<Map<String, Object>>) response.getData()
-                    : null;
+            List<Map<String, Object>> students = res != null && res.getCode() == 0 ? (List<Map<String, Object>>) res.getData() : null;
+            List<Map<String, Object>> relatedStudentList = response != null && response.getCode() == 0 ? (List<Map<String, Object>>) response.getData() : null;
 
             if (students != null && !students.isEmpty()) {
-                // 处理学生信息
                 Map<String, Object> studentMap = students.get(0);
-                Student targetStudent = createStudentFromMap(studentMap); // 封装对象创建逻辑
+                Student targetStudent = createStudentFromMap(studentMap);
 
-                // 处理获奖信息
                 List<Award> relatedAwards = new ArrayList<>();
                 if (relatedStudentList != null) {
                     for (Map<String, Object> awardMap : relatedStudentList) {
-                        relatedAwards.add(createAwardFromMap(awardMap)); // 封装奖项创建逻辑
+                        relatedAwards.add(createAwardFromMap(awardMap));
                     }
                 }
 
@@ -1028,9 +1044,7 @@ public class StudentController extends ToolController {
                 FileChooser fileDialog = new FileChooser();
                 fileDialog.setTitle("请选择导出文件路径");
                 fileDialog.setInitialDirectory(new File("D:/"));
-                fileDialog.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("PDF文件", "*.pdf")
-                );
+                fileDialog.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF文件", "*.pdf"));
 
                 File selectedFile = fileDialog.showSaveDialog(null);
                 if (selectedFile != null) {
@@ -1039,7 +1053,7 @@ public class StudentController extends ToolController {
                         filePath += ".pdf";
                     }
 
-                    // 生成PDF
+                    // 生成 PDF（注意：这里传入的是单学生列表）
                     generateStudentPdf(Collections.singletonList(targetStudent), relatedAwards, filePath);
                     MessageDialog.showDialog("导出成功！");
                 }

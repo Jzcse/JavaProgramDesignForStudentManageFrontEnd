@@ -54,30 +54,30 @@
             <version>1.3.34</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.itextpdf</groupId>
-                <artifactId>itext7-core</artifactId>
-                <version>7.2.5</version>
-                <type>pom</type>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.itextpdf</groupId>-->
+<!--                <artifactId>itext7-core</artifactId>-->
+<!--                <version>7.2.5</version>-->
+<!--                <type>pom</type>-->
+<!--            </dependency>-->
 
 
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>7.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>layout</artifactId>
-            <version>7.2.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.itextpdf</groupId>-->
+<!--            <artifactId>kernel</artifactId>-->
+<!--            <version>7.2.5</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.itextpdf</groupId>-->
+<!--            <artifactId>layout</artifactId>-->
+<!--            <version>7.2.5</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>font-asian</artifactId>
-            <version>7.2.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.itextpdf</groupId>-->
+<!--            <artifactId>font-asian</artifactId>-->
+<!--            <version>7.2.5</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -95,12 +95,7 @@
             <artifactId>bootstrapfx-core</artifactId>
             <version>0.4.0</version>
         </dependency>
-
-
-
     </dependencies>
-
-
     <build>
         <plugins>
             <plugin>
