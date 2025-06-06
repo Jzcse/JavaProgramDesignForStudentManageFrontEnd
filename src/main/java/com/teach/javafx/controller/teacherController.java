@@ -1,5 +1,12 @@
 package com.teach.javafx.controller;
 
+import com.lowagie.text.*;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.teach.javafx.controller.base.LocalDateStringConverter;
 import com.teach.javafx.controller.base.MessageDialog;
 import com.teach.javafx.controller.base.ToolController;
@@ -15,6 +22,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,11 +38,15 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 
+import java.awt.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class teacherController extends ToolController {
     //IMPORT FXML ID
@@ -598,244 +611,169 @@ public class teacherController extends ToolController {
         File file = fileChooser.showSaveDialog(dataTableView.getScene().getWindow());
 
         if (file != null) {
-            try (PDDocument document = new PDDocument()) {
-                PDPage page = new PDPage(PDRectangle.A4);
-                document.addPage(page);
+            try (FileOutputStream fos = new FileOutputStream(file);
+                 Document document = new Document(PageSize.A4)) {
 
-                // 加载字体
-                PDType0Font simsunFont;
-                PDType0Font simsunBoldFont;
+                PdfWriter writer = PdfWriter.getInstance(document, fos);
+                document.open();
+                document.setMargins(25, 25, 25, 25);
 
-                try (InputStream fontStream1 = getClass().getResourceAsStream("/fonts/simsun.ttf")) {
-                    if (fontStream1 == null) {
-                        throw new IOException("SimSun字体文件未找到，请确保/fonts/simsun.ttf存在");
-                    }
-                    simsunFont = PDType0Font.load(document, fontStream1);
-                }
+                // 颜色定义
+                Color secondaryColor = new Color(26, 35, 126);
+                Color textColor = new Color(33, 33, 33);
+                Color borderColor = new Color(200, 200, 200);
+                Color lightBackgroundColor = new Color(245, 245, 245);
 
-                try (InputStream fontStream2 = getClass().getResourceAsStream("/fonts/simsun.ttf")) {
-                    if (fontStream2 == null) {
-                        throw new IOException("SimSun字体文件未找到，请确保/fonts/simsun.ttf存在");
-                    }
-                    simsunBoldFont = PDType0Font.load(document, fontStream2);
-                }
+                try {
+                    // 字体处理（使用STSong-Light和UniGB-UCS2-H）
+                    BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.EMBEDDED);
+                    Font regularFont = new Font(baseFont, 10, Font.NORMAL, textColor);
+                    Font boldFont = new Font(baseFont, 14, Font.BOLD, secondaryColor);
+                    Font headerFont = new Font(baseFont, 20, Font.BOLD, secondaryColor); // 头部姓名专用字体
 
-                try (PDPageContentStream contentStream = new PDPageContentStream(document, page,
-                        PDPageContentStream.AppendMode.APPEND, true)) {
+                    // 创建简历容器表格
+                    PdfPTable containerTable = new PdfPTable(1);
+                    containerTable.setWidthPercentage(100);
+                    containerTable.setSpacingAfter(20f);
+                    containerTable.getDefaultCell().setBorder(Rectangle.BOX);
+                    containerTable.getDefaultCell().setBorderColor(borderColor);
+                    containerTable.getDefaultCell().setPadding(20);
 
-                    // 设置整个页面的底色
-                    drawPageBackground(contentStream);
+                    // 头部表格（左侧照片，右侧个人信息）
+                    PdfPTable headerTable = new PdfPTable(new float[]{1, 3}); // 照片:信息 = 1:3 比例
+                    headerTable.setWidthPercentage(100);
+                    headerTable.setSpacingAfter(15f);
 
-                    // 设置页面边框和内部内容区背景
-                    drawPageBorderAndContentBackground(contentStream);
+                    // 左侧照片占位框
+                    PdfPCell photoCell = new PdfPCell();
+                    photoCell.setBorder(Rectangle.NO_BORDER);
+                    photoCell.setPadding(5);
+                    photoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    photoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 
-                    // 页面边距和初始位置
-                    float margin = 40;
-                    float startX = margin;
-                    float yPosition = PDRectangle.A4.getHeight() - margin;
+                    PdfPTable photoInnerTable = new PdfPTable(1);
+                    photoInnerTable.setTotalWidth(80);
+                    photoInnerTable.setLockedWidth(true);
+                    PdfPCell photoInnerCell = new PdfPCell();
+                    photoInnerCell.setFixedHeight(90);
+                    photoInnerCell.setBorder(Rectangle.BOX);
+                    photoInnerCell.setBorderColor(borderColor);
+                    photoInnerTable.addCell(photoInnerCell);
 
-                    // 1. 标题和照片区
-                    drawPhotoAndTitleSection(contentStream, selectedTeacher, startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 130;
+                    photoCell.addElement(photoInnerTable);
+                    headerTable.addCell(photoCell);
 
-                    // 分隔线
-                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
-                    yPosition -= 20;
+                    // 右侧个人信息
+                    PdfPCell infoCell = new PdfPCell();
+                    infoCell.setBorder(Rectangle.NO_BORDER);
+                    infoCell.setPaddingTop(10);
+                    infoCell.setPaddingLeft(15);
+                    infoCell.setVerticalAlignment(Element.ALIGN_TOP);
 
-                    // 2. 个人资料区
-                    drawSectionTitle(contentStream, "个人资料", startX, yPosition, simsunBoldFont);
-                    yPosition -= 25;
-                    drawKeyValue(contentStream, "编号:", selectedTeacher.get("num"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 20;
-                    drawKeyValue(contentStream, "姓名:", selectedTeacher.get("name"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 20;
-                    drawKeyValue(contentStream, "性别:", getGenderDisplay(selectedTeacher.get("gender")), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 20;
-                    drawKeyValue(contentStream, "学院:", selectedTeacher.get("dept"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 20;
-                    drawKeyValue(contentStream, "职称:", selectedTeacher.get("title"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 30;
+                    // 教师姓名（放大字号，突出显示）
+                    Paragraph namePara = new Paragraph(selectedTeacher.get("name"), headerFont);
+                    namePara.setAlignment(Element.ALIGN_LEFT);
+                    namePara.setSpacingAfter(5f);
 
-                    // 分隔线
-                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
-                    yPosition -= 20;
+                    // 其他个人信息
+                    StringBuilder infoBuilder = new StringBuilder();
+                    infoBuilder.append("编号：").append(selectedTeacher.get("num")).append("    ")
+                            .append("性别：").append(getGenderDisplay(selectedTeacher.get("gender"))).append("\n");
+                    infoBuilder.append("学院：").append(selectedTeacher.get("dept")).append("    ")
+                            .append("职称：").append(selectedTeacher.get("title")).append("\n");
 
-                    // 3. 联系方式区
-                    drawSectionTitle(contentStream, "联系方式", startX, yPosition, simsunBoldFont);
-                    yPosition -= 25;
-                    drawKeyValue(contentStream, "邮箱:", selectedTeacher.get("email"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 20;
-                    drawKeyValue(contentStream, "电话:", selectedTeacher.get("phone"), startX, yPosition, simsunBoldFont, simsunFont);
-                    yPosition -= 30;
+                    Paragraph infoPara = new Paragraph(infoBuilder.toString(), regularFont);
+                    infoPara.setLeading(14f); // 设置行间距
+                    infoPara.setAlignment(Element.ALIGN_LEFT);
 
-                    // 分隔线
-                    drawDivider(contentStream, startX, yPosition, PDRectangle.A4.getWidth() - 2 * margin);
-                    yPosition -= 20;
+                    infoCell.addElement(namePara);
+                    infoCell.addElement(infoPara);
+                    headerTable.addCell(infoCell);
 
-                    // 4. 个人履历区（留白）
-                    drawSectionTitle(contentStream, "个人履历", startX, yPosition, simsunBoldFont);
-                    yPosition -= 25;
-                    contentStream.setFont(simsunFont, 12);
-                    contentStream.setNonStrokingColor(0.5f, 0.5f, 0.5f);
-                    contentStream.beginText();
-                    contentStream.newLineAtOffset(startX, yPosition);
-                    contentStream.showText("（请在此处填写个人履历信息）");
-                    contentStream.endText();
+                    containerTable.addCell(headerTable);
+
+                    // 个人资料部分
+                    containerTable.addCell(createSectionTitle("个人资料", boldFont, secondaryColor));
+                    PdfPTable personalInfoTable = createInfoTable();
+                    addInfoRow(personalInfoTable, "编号", selectedTeacher.get("num"), regularFont);
+                    addInfoRow(personalInfoTable, "姓名", selectedTeacher.get("name"), regularFont);
+                    addInfoRow(personalInfoTable, "性别", getGenderDisplay(selectedTeacher.get("gender")), regularFont);
+                    addInfoRow(personalInfoTable, "学院", selectedTeacher.get("dept"), regularFont);
+                    addInfoRow(personalInfoTable, "职称", selectedTeacher.get("title"), regularFont);
+                    containerTable.addCell(personalInfoTable);
+
+                    // 联系方式
+                    containerTable.addCell(createSectionTitle("联系方式", boldFont, secondaryColor));
+                    PdfPTable contactTable = createInfoTable();
+                    addInfoRow(contactTable, "邮箱", selectedTeacher.get("email"), regularFont);
+                    addInfoRow(contactTable, "电话", selectedTeacher.get("phone"), regularFont);
+                    containerTable.addCell(contactTable);
+
+                    // 个人履历区（留白）
+                    containerTable.addCell(createSectionTitle("个人履历", boldFont, secondaryColor));
+                    String introduction = "（请在此处填写个人履历信息）";
+                    Paragraph introPara = new Paragraph(introduction, regularFont);
+                    introPara.setAlignment(Element.ALIGN_JUSTIFIED);
+                    introPara.setLeading(16.5f);
+                    containerTable.addCell(introPara);
+
+                    document.add(containerTable);
 
                     // 页脚
-                    drawFooter(contentStream, margin, simsunFont);
-                }
+                    Paragraph footer = new Paragraph(
+                            "简历生成时间: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                            new Font(baseFont, 8, Font.NORMAL, new Color(150, 150, 150))
+                    );
+                    footer.setAlignment(Element.ALIGN_CENTER);
+                    document.add(footer);
 
-                document.save(file);
-                MessageDialog.showDialog("PDF 简历导出成功！");
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                    MessageDialog.showDialog("导出失败：生成PDF文档时出错");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                MessageDialog.showDialog("导出失败：" + e.getMessage());
+                MessageDialog.showDialog("导出失败：文件操作错误");
             }
         }
     }
 
-    private void drawPageBackground(PDPageContentStream contentStream) throws IOException {
-        // 整个页面的底色（比内部区域稍浅）
-        contentStream.setNonStrokingColor(0.95f, 0.97f, 1.0f); // 非常浅的蓝色
-        contentStream.addRect(0, 0, PDRectangle.A4.getWidth(), PDRectangle.A4.getHeight());
-        contentStream.fill();
+    // 辅助方法 - 创建信息行
+    private static void addInfoRow(PdfPTable table, String label, String value, Font font) {
+        if (value == null || value.isEmpty()) {
+            value = "暂无信息";
+        }
+
+        Font labelFont = new Font(font.getBaseFont(), font.getSize(), Font.NORMAL, new Color(97, 97, 97));
+        Font valueFont = new Font(font.getBaseFont(), font.getSize(), Font.NORMAL, font.getColor());
+
+        PdfPCell labelCell = new PdfPCell(new Phrase(label + ":", labelFont));
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setPadding(3);
+
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setPadding(3);
+
+        table.addCell(labelCell);
+        table.addCell(valueCell);
     }
 
-    private void drawPageBorderAndContentBackground(PDPageContentStream contentStream) throws IOException {
-        // 内部内容区的边距和尺寸
-        float margin = 30;
-        float width = PDRectangle.A4.getWidth() - 2 * margin;
-        float height = PDRectangle.A4.getHeight() - 2 * margin;
-
-        // 绘制内部内容区背景（浅蓝色）
-        contentStream.setNonStrokingColor(0.9f, 0.95f, 1.0f); // 浅蓝色
-        contentStream.addRect(margin, margin, width, height);
-        contentStream.fill();
-
-        // 绘制边框
-        contentStream.setStrokingColor(0.6f, 0.6f, 0.6f);
-        contentStream.setLineWidth(1.5f);
-        contentStream.addRect(margin, margin, width, height);
-        contentStream.stroke();
+    private static PdfPCell createSectionTitle(String title, Font font, Color color) {
+        PdfPCell cell = new PdfPCell(new Phrase(title, font));
+        cell.setBorder(Rectangle.BOTTOM);
+        cell.setBorderColor(new Color(224, 224, 224));
+        cell.setBorderWidth(0.7f);
+        cell.setPaddingBottom(5);
+        cell.setPaddingTop(5);
+        return cell;
     }
 
-    private void drawPhotoAndTitleSection(PDPageContentStream contentStream, Map<String, String> teacher,
-                                          float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
-        // 照片占位框
-        float photoSize = 90;
-        float photoX = x + 10;
-        float photoY = y - photoSize - 10;
-
-        // 绘制照片框
-        contentStream.setStrokingColor(0.4f, 0.4f, 0.4f);
-        contentStream.setLineWidth(1);
-        contentStream.addRect(photoX, photoY, photoSize, photoSize);
-        contentStream.stroke();
-
-        // 照片框内文字提示
-        contentStream.setFont(regularFont, 10);
-        contentStream.setNonStrokingColor(0.6f, 0.6f, 0.6f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(photoX + photoSize/2 - 25, photoY + photoSize/2);
-        contentStream.showText("照片区域");
-        contentStream.endText();
-
-        // 右侧标题和信息
-        float textX = photoX + photoSize + 20;
-        float textY = y - 20;
-
-        // 姓名（大字）
-        contentStream.setFont(boldFont, 24);
-        contentStream.setNonStrokingColor(0, 0, 0);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(textX, textY);
-        contentStream.showText(teacher.get("name"));
-        contentStream.endText();
-
-        // 编号、学院、职称（小字）
-        contentStream.setFont(regularFont, 12);
-        contentStream.setNonStrokingColor(0.4f, 0.4f, 0.4f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(textX, textY - 30);
-        contentStream.showText("编号: " + teacher.get("num"));
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(textX, textY - 50);
-        contentStream.showText("学院: " + teacher.get("dept"));
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(textX, textY - 70);
-        contentStream.showText("职称: " + teacher.get("title"));
-        contentStream.endText();
-    }
-
-    private void drawTitle(PDPageContentStream contentStream, Map<String, String> teacher,
-                           float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
-        contentStream.setFont(boldFont, 20);
-        contentStream.setNonStrokingColor(0, 0, 0);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(x, y);
-        contentStream.showText(teacher.get("name") + " 教师简历");
-        contentStream.endText();
-
-        contentStream.setFont(regularFont, 12);
-        contentStream.setNonStrokingColor(0.4f, 0.4f, 0.4f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(x, y - 20);
-        contentStream.showText("工号: " + teacher.get("num") + " | 职称: " + teacher.get("title"));
-        contentStream.endText();
-    }
-
-    private void drawSectionTitle(PDPageContentStream contentStream, String title,
-                                  float x, float y, PDType0Font boldFont) throws IOException {
-        contentStream.setFont(boldFont, 14);
-        contentStream.setNonStrokingColor(0.2f, 0.2f, 0.6f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(x, y);
-        contentStream.showText(title);
-        contentStream.endText();
-    }
-
-    private void drawKeyValue(PDPageContentStream contentStream, String key, String value,
-                              float x, float y, PDType0Font boldFont, PDType0Font regularFont) throws IOException {
-        // 绘制键（粗体）
-        contentStream.setFont(boldFont, 12);
-        contentStream.setNonStrokingColor(0.3f, 0.3f, 0.3f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(x, y);
-        contentStream.showText(key);
-        contentStream.endText();
-
-        // 绘制值（常规字体）
-        contentStream.setFont(regularFont, 12);
-        contentStream.setNonStrokingColor(0.1f, 0.1f, 0.1f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(x + 60, y);
-        contentStream.showText(value != null ? value : "未填写");
-        contentStream.endText();
-    }
-
-    private void drawFooter(PDPageContentStream contentStream, float margin, PDType0Font font) throws IOException {
-        String footerText = "简历生成时间: " + LocalDate.now().toString();
-        float textWidth = font.getStringWidth(footerText) / 1000 * 10;
-
-        contentStream.setFont(font, 10);
-        contentStream.setNonStrokingColor(0.5f, 0.5f, 0.5f);
-        contentStream.beginText();
-        contentStream.newLineAtOffset((PDRectangle.A4.getWidth() - textWidth) / 2, margin - 15);
-        contentStream.showText(footerText);
-        contentStream.endText();
-    }
-
-    private void drawDivider(PDPageContentStream contentStream, float x, float y, float width) throws IOException {
-        contentStream.setStrokingColor(0.8f, 0.8f, 0.8f);
-        contentStream.setLineWidth(1);
-        contentStream.moveTo(x, y);
-        contentStream.lineTo(x + width, y);
-        contentStream.stroke();
+    private static PdfPTable createInfoTable() {
+        PdfPTable table = new PdfPTable(2); // 使用两列布局
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+        return table;
     }
 
     private String getGenderDisplay(String genderCode) {
