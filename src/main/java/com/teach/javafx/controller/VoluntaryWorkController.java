@@ -53,13 +53,16 @@ public class VoluntaryWorkController {
 
     @FXML
     private void onQueryButtonClick(){
-        String awardName = workNameTextField.getText();
+        String awardName = workSearchNameField.getText();
         DataRequest req = new DataRequest();
         req.add("workName",awardName);
         DataResponse res = HttpRequestUtil.request("/api/voluntaryWork/getSelectedList",req);
         if(res != null && res.getCode() == 0){
             workList = (ArrayList<Map<String,String>>) res.getData();
             setTableView();
+        }
+        if(awardName == null || awardName.isEmpty()){
+            refreshWorkList();
         }
     }
 
@@ -69,7 +72,7 @@ public class VoluntaryWorkController {
         DataResponse dataResponse = HttpRequestUtil.request("/api/voluntaryWork/getVoluntaryWorkList",dataRequest);
         if(dataResponse != null && dataResponse.getCode() == 0){
             Map<Integer,Map<String,String>> workMap = (Map<Integer,Map<String,String>>) dataResponse.getData();
-            workList = (ArrayList<Map<String,String>>) dataResponse.getData();
+            workList = (new ArrayList<>(workMap.values()));
             setTableView();
         }
     }
@@ -118,22 +121,12 @@ public class VoluntaryWorkController {
         }
 
         currentWorkId = CommonMethod.getInteger(form,"workId");
-        DataRequest dataRequest = new DataRequest();
-        dataRequest.add("workId",currentWorkId);
-        DataResponse res = HttpRequestUtil.request("/api/voluntaryWork/getVoluntaryWorkList",dataRequest);
+        workNameTextField.setText(form.get("workName"));
+        workTimeTextField.setText(form.get("workTime"));
+        workSizeTextField.setText(form.get("workSize"));
+        workTypeComboBox.setValue(form.get("workType"));
+        workLevelComboBox.setValue(form.get("workLevel"));
 
-        if (res.getCode() != 0) {
-            MessageDialog.showDialog(res.getMsg());
-            return;
-        }
-
-        form = (Map) res.getData();
-        workNameTextField.setText(CommonMethod.getString(form,"workName"));
-        workTimeTextField.setText(CommonMethod.getString(form,"workTime"));
-        workSizeTextField.setText(CommonMethod.getString(form,"workSize"));
-        workTypeComboBox.setValue(CommonMethod.getString(form,"workType"));
-        workLevelComboBox.setValue(CommonMethod.getString(form,"workLevel"));
-        workSearchNameField.setText(CommonMethod.getString(form,"workName"));
     }
 
     @FXML
