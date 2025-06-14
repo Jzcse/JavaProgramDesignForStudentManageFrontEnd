@@ -188,7 +188,7 @@ public class FamilyMemberController {
                     MessageDialog.showDialog(dataResponse.getMsg());
                 }
             } else {
-                System.out.println("error in delete family member");
+                System.err.println("error in delete family member");
             }
         }
     }

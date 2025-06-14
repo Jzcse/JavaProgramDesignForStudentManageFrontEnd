@@ -17,21 +17,14 @@
                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </FlowPane.margin>
          </Button>
-         <Button alignment="CENTER" mnemonicParsing="false" onAction="#onImportButtonClick" text="导入">
-            <FlowPane.margin>
-               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </FlowPane.margin>
-         </Button>
          <FlowPane alignment="CENTER_RIGHT">
-            <children>
-               <Label text="学号" textAlignment="CENTER" />
-               <TextField fx:id="nameTextField" maxWidth="100" promptText="请输入你要添加的获奖学生学号" />
-               <Button fx:id="saveOrAddButton" alignment="CENTER" onAction="#onSaveOrAddButtonClick" text="保存/添加">
-                  <FlowPane.margin>
-                     <Insets bottom="10" top="10" />
-                  </FlowPane.margin>
-               </Button>
-            </children>
+            <Label text="学号" textAlignment="CENTER"/>
+            <TextField fx:id="nameTextField" maxWidth="100" promptText="请输入你要添加的获奖学生学号"/>
+            <Button fx:id="saveOrAddButton" alignment="CENTER" onAction="#onSaveOrAddButtonClick" text="保存/添加">
+               <FlowPane.margin>
+                  <Insets bottom="10" top="10"/>
+               </FlowPane.margin>
+            </Button>
          </FlowPane>
       </FlowPane>
    </top>
